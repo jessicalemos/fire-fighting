@@ -1,10 +1,9 @@
 package agents;
 import jade.core.Agent;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
-
+import java.util.ArrayList;
 import jade.content.ContentElement;
 import jade.content.lang.Codec.CodecException;
 import jade.content.onto.OntologyException;
@@ -29,6 +28,7 @@ public class AgenteCentral extends Agent {
 	protected void setup() {
 		super.setup();
 		drones=10;aeronaves=5;camioes=2;
+		this.incendiosAtivos = new ArrayList<Incendio>();
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
@@ -60,12 +60,11 @@ public class AgenteCentral extends Agent {
 						}
 					}
 					else if (mensagem.getContentObject() instanceof Incendio) {
-						ContentElement content;
 						try {
-							content = getContentManager().extractContent(mensagem);
-							Incendio c=(Incendio)((Action) content).getAction();
+							Incendio c = (Incendio) mensagem.getContentObject();
+							System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getpos_x() + " " + c.getpos_y() + "\n");
 							incendiosAtivos.add(c);
-						} catch (CodecException | OntologyException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 
