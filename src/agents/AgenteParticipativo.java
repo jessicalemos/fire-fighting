@@ -1,10 +1,10 @@
 package agents;
 import java.io.IOException;
 import java.io.Serializable;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -13,18 +13,20 @@ import jade.lang.acl.ACLMessage;
 
 public class AgenteParticipativo extends Agent implements Serializable{
 	protected int combustivel;
-	protected int agua;
+	protected int agua; protected int velocidade;
 	protected int pos_x;protected int pos_y;
 	protected int dest_x;protected int dest_y;
+	protected int tipo;
 	protected void setup() {
 		super.setup();
+		pos_x=0; pos_y=0;
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("combate");
 		sd.setName(getLocalName());
 		dfd.addServices(sd);
-		this.addBehaviour(new EnviaPosicao());
+		this.addBehaviour(new EnviaPosicao(this,5000));
 		try {
 			DFService.register(this, dfd);
 		} catch (FIPAException e) {
@@ -32,31 +34,20 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		}
 	}
 
-	private class EnviaPosicao extends CyclicBehaviour {	
-		public void action() {
-			DFAgentDescription template = new DFAgentDescription();
-			ServiceDescription sd = new ServiceDescription();
-			sd.setType("central");
-			template.addServices(sd);
-
-			DFAgentDescription[] result;
+	protected class EnviaPosicao extends TickerBehaviour{	
+		public EnviaPosicao(Agent a, long period) {
+			super(a, period);
+		}
+		protected void onTick() {
+			AID i= new AID();
+			i.setLocalName("AgenteCentral");
+			ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
+			Agente a= new Agente(combustivel,agua,pos_x,pos_y,tipo);
 			try {
-				result = DFService.search(myAgent, template);
-				DFAgentDescription central= result[0];
-				AID idQuartel = central.getName();
-				ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
-	
-				try {
-					msg.setContentObject(this);
-					msg.addReceiver(idQuartel);
-					AID local= this.myAgent.getAID();
-					msg.setSender(local);
-					send(msg);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} catch (FIPAException e) {
+				msg.setContentObject(a);
+				msg.addReceiver(i);
+				send(msg);
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

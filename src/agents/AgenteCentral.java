@@ -19,7 +19,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 
 public class AgenteCentral extends Agent {
-	private HashMap<AID,AgenteParticipativo> agentesCombate;
+	private HashMap<AID,Agente> agentesCombate;
 	private List<Incendio> incendiosAtivos;
 	private int drones;
 	private int aeronaves;
@@ -29,60 +29,33 @@ public class AgenteCentral extends Agent {
 		super.setup();
 		drones=10;aeronaves=5;camioes=2;
 		this.incendiosAtivos = new ArrayList<Incendio>();
-		DFAgentDescription dfd = new DFAgentDescription();
-		dfd.setName(getAID());
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType("central");
-		sd.setName(getLocalName());
-		dfd.addServices(sd);
+		this.agentesCombate= new HashMap<AID,Agente>();
 		this.addBehaviour(new RecebePosicao());
-		this.addBehaviour(new EnviaCombate());
-		try {
-			DFService.register(this, dfd);
-		} catch (FIPAException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private class RecebePosicao extends CyclicBehaviour {	
 		public void action() {
 			ACLMessage mensagem= receive();
 			if (mensagem!=null) {
-				try {
-					if(mensagem.getContentObject() instanceof AgenteParticipativo) {
-						try {
-							ContentElement content = getContentManager().extractContent(mensagem);
-							AgenteParticipativo c=(AgenteParticipativo)((Action) content).getAction();
+					try {
+						if(mensagem.getContentObject() instanceof Agente) {
+							Agente c= (Agente) mensagem.getContentObject();
 							AID sender=mensagem.getSender();
-							agentesCombate.put(sender,c);					
-						} catch (CodecException | OntologyException e) {
-							e.printStackTrace();
+							agentesCombate.put(sender,c);
+							System.out.println("Guardei informacao do "+sender.getLocalName());
 						}
-					}
-					else if (mensagem.getContentObject() instanceof Incendio) {
-						try {
-							Incendio c = (Incendio) mensagem.getContentObject();
-							System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getpos_x() + " " + c.getpos_y() + "\n");
-							incendiosAtivos.add(c);
-						} catch (Exception e) {
-							e.printStackTrace();
+						else if (mensagem.getContentObject() instanceof Incendio) {
+							
+								Incendio c = (Incendio) mensagem.getContentObject();
+								System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getpos_x() + " " + c.getpos_y() + "\n");
+								incendiosAtivos.add(c);
 						}
-
+					} catch (UnreadableException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} catch (UnreadableException e) {
-					e.printStackTrace();
 				}
 
 			}
 		}
-	}
-	
-	private class EnviaCombate extends OneShotBehaviour{
-		@Override
-		public void action() {
-			
-			
-		}
-		
-	}
-}
+	}	

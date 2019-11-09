@@ -2,7 +2,7 @@ package agents;
 
 import java.io.Serializable;
 
-public class Agente implements Serializable{
+public class Agente implements Serializable {
 private int combustivel;
 private int agua;
 private int pos_x;
@@ -15,7 +15,8 @@ private int tipo;
 		int pos_y=0;
 		int tipo=0;
 	}
-	public Agente (int combustivel,int agua,int pos_x,int pos_y,int tipo) {
+	public Agente(int combustivel,int agua,int pos_x,int pos_y,int tipo) {
+		super();
 		this.combustivel=combustivel;
 		this.agua=agua;
 		this.pos_x=pos_x;
