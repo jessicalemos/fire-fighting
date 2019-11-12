@@ -7,28 +7,23 @@ private int combustivel;
 private int agua;
 private int pos_x;
 private int pos_y;
-private int tipo;
+private boolean disponivel;
 	public Agente() {
 		int combustivel=0;
 		int agua=0;
 		int pos_x=0;
 		int pos_y=0;
-		int tipo=0;
+		boolean disponivel=true;
 	}
-	public Agente(int combustivel,int agua,int pos_x,int pos_y,int tipo) {
+	public Agente(int combustivel,int agua,int pos_x,int pos_y,boolean disponivel) {
 		super();
 		this.combustivel=combustivel;
 		this.agua=agua;
 		this.pos_x=pos_x;
 		this.pos_y=pos_y;
-		this.tipo=tipo;
+		this.disponivel=disponivel;
 	}
-	public int getTipo() {
-		return tipo;
-	}
-	public void setTipo(int tipo) {
-		this.tipo = tipo;
-	}
+
 	public int getCombustivel() {
 		return combustivel;
 	}
@@ -53,4 +48,10 @@ private int tipo;
 	public void setPos_y(int pos_y) {
 		this.pos_y = pos_y;
 	}
+	public boolean isDisponivel() {
+	return disponivel;
+}
+public void setDisponivel(boolean disponivel) {
+	this.disponivel = disponivel;
+}
 }

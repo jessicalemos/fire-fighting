@@ -9,6 +9,5 @@ public class Aeronave extends AgenteParticipativo implements Serializable{
 		combustivel=10;
 		agua=5;
 		velocidade = 2;
-		tipo=2;
 	}
 }

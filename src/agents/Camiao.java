@@ -9,6 +9,5 @@ public class Camiao extends AgenteParticipativo implements Serializable{
 		combustivel=20;
 		agua=10;
 		velocidade= 1;
-		tipo=1;
 	}
 }

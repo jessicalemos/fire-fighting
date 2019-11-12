@@ -8,6 +8,5 @@ public class Drone extends AgenteParticipativo implements Serializable{
 		combustivel=5;
 		agua=2;
 		velocidade = 4;
-		tipo=3;
 	}
 }
