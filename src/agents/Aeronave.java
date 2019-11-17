@@ -6,8 +6,11 @@ public class Aeronave extends AgenteParticipativo implements Serializable{
 
 	protected void setup() {
 		super.setup();
-		combustivel=10;
-		agua=5;
+		combustivel_max = 10;
+		agua_max = 5;
 		velocidade = 2;
+		consumo = 0.08;
+		combustivel_atual = combustivel_max;
+		agua_atual = agua_max;
 	}
 }

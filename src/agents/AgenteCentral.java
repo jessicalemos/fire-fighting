@@ -41,10 +41,10 @@ public class AgenteCentral extends Agent {
 						if(mensagem.getContentObject() instanceof Agente) {
 							Agente c= (Agente) mensagem.getContentObject();
 							AID sender=mensagem.getSender();
-							AgenteParticipativo x=agentesCombate.get(sender);
+							/*AgenteParticipativo x=agentesCombate.get(sender);
 							x.setAgua(c.getAgua());x.setCombustivel(c.getCombustivel());x.setPos_x(c.getPos_x());x.setPos_y(c.getPos_y());x.setDisponivel(c.isDisponivel());
 							agentesCombate.put(sender,x);
-							System.out.println("Guardei informacao do "+sender.getLocalName());
+							System.out.println("Guardei informacao do "+sender.getLocalName());*/
 						}
 						else if (mensagem.getContentObject() instanceof Incendio) {
 							
@@ -52,12 +52,12 @@ public class AgenteCentral extends Agent {
 								System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getpos_x() + " " + c.getpos_y() + "\n");
 								incendiosAtivos.add(c);
 						}
-						else if (mensagem.getContentObject() instanceof AgenteParticipativo) {
+						/*else if (mensagem.getContentObject() instanceof AgenteParticipativo) {
 							AgenteParticipativo c= (AgenteParticipativo) mensagem.getContentObject();
 							AID sender=mensagem.getSender();
 							agentesCombate.put(sender,c);
 							System.out.println("Guardei informacao do "+sender.getLocalName());
-						}
+						}*/
 					} catch (UnreadableException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

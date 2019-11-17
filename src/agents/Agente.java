@@ -3,7 +3,7 @@ package agents;
 import java.io.Serializable;
 
 public class Agente implements Serializable {
-private int combustivel;
+private double combustivel;
 private int agua;
 private int pos_x;
 private int pos_y;
@@ -15,7 +15,7 @@ private boolean disponivel;
 		int pos_y=0;
 		boolean disponivel=true;
 	}
-	public Agente(int combustivel,int agua,int pos_x,int pos_y,boolean disponivel) {
+	public Agente(double combustivel,int agua,int pos_x,int pos_y,boolean disponivel) {
 		super();
 		this.combustivel=combustivel;
 		this.agua=agua;
@@ -24,10 +24,10 @@ private boolean disponivel;
 		this.disponivel=disponivel;
 	}
 
-	public int getCombustivel() {
+	public double getCombustivel() {
 		return combustivel;
 	}
-	public void setCombustivel(int combustivel) {
+	public void setCombustivel(double combustivel) {
 		this.combustivel = combustivel;
 	}
 	public int getAgua() {
@@ -49,9 +49,9 @@ private boolean disponivel;
 		this.pos_y = pos_y;
 	}
 	public boolean isDisponivel() {
-	return disponivel;
-}
-public void setDisponivel(boolean disponivel) {
-	this.disponivel = disponivel;
-}
+		return disponivel;
+	}
+	public void setDisponivel(boolean disponivel) {
+		this.disponivel = disponivel;
+	}
 }

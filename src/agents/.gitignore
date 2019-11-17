@@ -1,0 +1,17 @@
+/Aeronave.class
+/Agente.class
+/AgenteCentral$RecebePosicao.class
+/AgenteCentral.class
+/AgenteParticipativo$EnviaInicio.class
+/AgenteParticipativo$EnviaPosicao.class
+/AgenteParticipativo.class
+/AgenteSecundario$EnviaIncendio.class
+/AgenteSecundario$GerarIncendio.class
+/AgenteSecundario.class
+/Camiao.class
+/Drone.class
+/Incendio.class
+/Abastecimento.class
+/Posicao.class
+/AgenteParticipativo$Movimento.class
+/AgenteParticipativo$RecebePosição.class
