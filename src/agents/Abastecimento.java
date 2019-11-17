@@ -3,8 +3,9 @@ package agents;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.io.Serializable;
 
-public class Abastecimento {
+public class Abastecimento implements Serializable {
 	private List<Posicao> local_agua;
 	private List<Posicao> local_combustivel;
 	

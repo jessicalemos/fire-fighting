@@ -1,6 +1,7 @@
 package agents;
+import java.io.Serializable;
 
-public class Posicao {
+public class Posicao implements Serializable {
 	private int x;
 	private int y;
 	

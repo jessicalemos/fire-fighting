@@ -115,7 +115,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		sd.setType("combate");
 		sd.setName(getLocalName());
 		dfd.addServices(sd);
-		//this.addBehaviour(new EnviaInicio());
+		this.addBehaviour(new EnviaInicio());
 		this.addBehaviour(new EnviaPosicao(this,5000));
 		this.addBehaviour(new Movimento(this, 1000));
 		//this.addBehaviour(new RecebePosição());
