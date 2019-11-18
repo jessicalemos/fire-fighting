@@ -42,14 +42,17 @@ public class AgenteCentral extends Agent {
 							Agente c= (Agente) mensagem.getContentObject();
 							AID sender=mensagem.getSender();
 							AgenteParticipativo x=agentesCombate.get(sender);
-							x.setAgua(c.getAgua());x.setCombustivel(c.getCombustivel());x.setPos_x(c.getPos_x());x.setPos_y(c.getPos_y());x.setDisponivel(c.isDisponivel());
+							x.setAgua(c.getAgua());
+							x.setCombustivel(c.getCombustivel());
+						    x.setPos(c.getPos());
+							x.setDisponivel(c.isDisponivel());
 							agentesCombate.put(sender,x);
 							System.out.println("Guardei informacao do "+sender.getLocalName());
 						}
 						else if (mensagem.getContentObject() instanceof Incendio) {
 							
 								Incendio c = (Incendio) mensagem.getContentObject();
-								System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getpos_x() + " " + c.getpos_y() + "\n");
+								System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getPos().getX() + " " + c.getPos().getY() + "\n");
 								incendiosAtivos.add(c);
 						}
 						else if (mensagem.getContentObject() instanceof AgenteParticipativo) {
