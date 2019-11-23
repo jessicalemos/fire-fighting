@@ -144,8 +144,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			super(a, period);
 		}
 		protected void onTick() {
-			//trocar para false -> apenas para o teste
-			if(disponivel==true) {
+			if(disponivel==false) {
 				double dist = Math.sqrt(Math.pow((dest.getX()-pos.getX()),2) + Math.pow((dest.getY()-pos.getY()),2));
 				if (abastecer_combustivel == true) {
 					System.out.println("Vou para o combustível " + getAID().getLocalName());
@@ -180,7 +179,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					enviaDisponivel();
 					System.out.println("Abasteci " + getAID().getLocalName() + " tenho agua: " + agua_atual);
 				}
-				if (destino_dist <= velocidade && incendio_extinto==false) {
+				else if (destino_dist <= velocidade && incendio_extinto==false) {
 					pos.setX(dest.getX());
 					pos.setY(dest.getY());
 					agua_atual--;
@@ -192,7 +191,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					int cenas_y = (int) (velocidade * (dest.getY() - pos.getY()) / dist);
 					pos.setX(pos.getX() + cenas_x);
 					pos.setY(pos.getY() + cenas_y);
-					/*	System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());*/
+					System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());
 					int dist_percorrida = (int) Math.sqrt(Math.pow(cenas_x, 2) + Math.pow(cenas_y, 2));
 					combustivel_atual -= dist_percorrida * consumo;
 					/*	System.out.println("Combustivel atual: " + combustivel_atual);*/

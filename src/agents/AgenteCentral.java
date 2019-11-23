@@ -48,7 +48,7 @@ public class AgenteCentral extends Agent {
 						x.setCombustivel(c.getCombustivel());
 						x.setPos(c.getPos());
 						agentesCombate.put(sender,x);
-						System.out.println("Guardei informacao do "+sender.getLocalName());
+						System.out.println("Guardei informacao do "+sender.getLocalName()+ " "+ x.disponivel);
 					}
 					else if (mensagem.getContentObject() instanceof Incendio) {
 
