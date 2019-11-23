@@ -253,7 +253,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		}
 	}
 	private void enviaDisponivel(){
-		ACLMessage msg= new ACLMessage(ACLMessage.UNKNOWN);
+		ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
 		AID central= new AID();
 		central.setLocalName("AgenteCentral");
 		msg.addReceiver(central);

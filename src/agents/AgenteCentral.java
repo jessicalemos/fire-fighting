@@ -1,6 +1,7 @@
 package agents;
 import jade.core.Agent;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -39,49 +40,42 @@ public class AgenteCentral extends Agent {
 			ACLMessage mensagem= receive();
 			if (mensagem!=null) {
 				try {
-					if (mensagem.getPerformative()== ACLMessage.INFORM){
-						if(mensagem.getContentObject() instanceof Agente) {
-							Agente c= (Agente) mensagem.getContentObject();
-							AID sender=mensagem.getSender();
-							AgenteParticipativo x=agentesCombate.get(sender);
-							x.setAgua(c.getAgua());
-							x.setCombustivel(c.getCombustivel());
-							x.setPos(c.getPos());
-							agentesCombate.put(sender,x);
-							System.out.println("Guardei informacao do "+sender.getLocalName());
-						}
-						else if (mensagem.getContentObject() instanceof Incendio) {
-
-							Incendio c = (Incendio) mensagem.getContentObject();
-							System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getPos().getX() + " " + c.getPos().getY() + "\n");
-							incendiosAtivos.add(c);
-						}
-						else if (mensagem.getContentObject() instanceof AgenteParticipativo) {
-							AgenteParticipativo c= (AgenteParticipativo) mensagem.getContentObject();
-							AID sender=mensagem.getSender();
-							agentesCombate.put(sender,c);
-							System.out.println("Guardei informacao do "+sender.getLocalName());
-						}
-					}
-					else {
-						String a= mensagem.getContent();
-						AID sender= mensagem.getSender();
-						AgenteParticipativo x = agentesCombate.get(sender);
-						String[] lista = a.split(" ");
-						if (lista[0].equals("true")) {
-							x.setDisponivel(true);
-							atualizaContadores(lista[1].trim());
-						}
-						else x.setDisponivel(false);
+					if(mensagem.getContentObject() instanceof Agente) {
+						Agente c= (Agente) mensagem.getContentObject();
+						AID sender=mensagem.getSender();
+						AgenteParticipativo x=agentesCombate.get(sender);
+						x.setAgua(c.getAgua());
+						x.setCombustivel(c.getCombustivel());
+						x.setPos(c.getPos());
 						agentesCombate.put(sender,x);
-						System.out.println("disponivel"+ x.getLocalName()+" "+x.disponivel+" "+a.trim());
+						System.out.println("Guardei informacao do "+sender.getLocalName());
 					}
-				} catch (UnreadableException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					else if (mensagem.getContentObject() instanceof Incendio) {
+
+						Incendio c = (Incendio) mensagem.getContentObject();
+						System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getPos().getX() + " " + c.getPos().getY() + "\n");
+						incendiosAtivos.add(c);
+					}
+					else if (mensagem.getContentObject() instanceof AgenteParticipativo) {
+						AgenteParticipativo c= (AgenteParticipativo) mensagem.getContentObject();
+						AID sender=mensagem.getSender();
+						agentesCombate.put(sender,c);
+						System.out.println("Guardei informacao do "+sender.getLocalName());
+					}
+				} catch (Exception e) {
+					String a= mensagem.getContent();
+					AID sender= mensagem.getSender();
+					AgenteParticipativo x = agentesCombate.get(sender);
+					String[] lista = a.split(" ");
+					if (lista[0].equals("true")) {
+						x.setDisponivel(true);
+						atualizaContadores(lista[1].trim());
+					}
+					else x.setDisponivel(false);
+					agentesCombate.put(sender,x);
+					System.out.println("disponivel"+ x.getLocalName()+" "+x.disponivel+" "+a.trim());
 				}
 			}
-
 		}
 	}
 	private class EnviaCombate extends CyclicBehaviour {
