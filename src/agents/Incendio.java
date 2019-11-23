@@ -21,18 +21,18 @@ public class Incendio implements Serializable{
 	public int getGravidade() {
 		return gravidade;
 	}
-	
+
 	public void setGravidade(int gravidade) {
 		this.gravidade = gravidade;
 	}
-	
+
 	public Posicao getPos() {
 		return pos;
 	}
-	
+
 	public void setpos_x(Posicao pos) {
 		this.pos.setX(pos.getX());
 		this.pos.setY(pos.getY());
 	}
-	
+
 }

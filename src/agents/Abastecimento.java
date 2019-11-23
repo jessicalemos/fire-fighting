@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class Abastecimento implements Serializable {
 	private List<Posicao> local_agua;
 	private List<Posicao> local_combustivel;
-	
+
 	public Abastecimento() {
 		this.local_agua = new ArrayList<>();
 		this.local_combustivel = new ArrayList<>();

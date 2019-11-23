@@ -19,7 +19,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 	protected double combustivel_max;
 	protected boolean disponivel;
 	protected int agua_atual;
-	protected int agua_max; 
+	protected int agua_max;
 	protected int velocidade;
 	protected Posicao pos;
 	protected Posicao dest = new Posicao(100,100);
@@ -31,7 +31,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 	protected boolean abastecer_combustivel;
 	protected Posicao agua_pos;
 	protected Posicao combustivel_pos;
-	
+
 	public boolean getDisponivel() {
 		return disponivel;
 	}
@@ -42,7 +42,6 @@ public class AgenteParticipativo extends Agent implements Serializable{
 	public double getCombustivel() {
 		return combustivel_atual;
 	}
-
 	public void setCombustivel(double combustivel) {
 		this.combustivel_atual = combustivel;
 	}
@@ -68,8 +67,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 	}
 
 	public void setPos(Posicao pos) {
-		this.pos.setX(pos.getX());
-		this.pos.setY(pos.getY());
+		this.pos=pos;
 	}
 
 	public Posicao getDest() {
@@ -99,14 +97,14 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		this.addBehaviour(new EnviaInicio());
 		this.addBehaviour(new EnviaPosicao(this,5000));
 		this.addBehaviour(new Movimento(this, 1000));
-		//this.addBehaviour(new RecebePosição());
+		this.addBehaviour(new RecebePosição());
 		try {
 			DFService.register(this, dfd);
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Posicao AbastecimentoMaisProximo(int tipo) {
 		double min = 500;
 		Posicao mais_proximo = null;
@@ -140,7 +138,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			System.out.println("Na água "+agua_pos.getX() + " " + agua_pos.getY());
 		}
 	}
-	
+
 	private class Movimento extends TickerBehaviour {
 		public Movimento(Agent a, long period) {
 			super(a, period);
@@ -169,6 +167,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					combustivel_atual = combustivel_max;
 					abastecer_combustivel = false;
 					disponivel = true;
+					enviaDisponivel();
 					System.out.println("Abasteci " + getAID().getLocalName() + " tenho combustivel: " + combustivel_atual);
 				}
 				else if (abastecer_agua == true && abastecer_combustivel == false && destino_dist <= velocidade) {
@@ -178,6 +177,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					abastecer_agua = false;
 					agua_atual = agua_max;
 					disponivel = true;
+					enviaDisponivel();
 					System.out.println("Abasteci " + getAID().getLocalName() + " tenho agua: " + agua_atual);
 				}
 				if (destino_dist <= velocidade && incendio_extinto==false) {
@@ -192,15 +192,15 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					int cenas_y = (int) (velocidade * (dest.getY() - pos.getY()) / dist);
 					pos.setX(pos.getX() + cenas_x);
 					pos.setY(pos.getY() + cenas_y);
-					System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());
+					/*	System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());*/
 					int dist_percorrida = (int) Math.sqrt(Math.pow(cenas_x, 2) + Math.pow(cenas_y, 2));
 					combustivel_atual -= dist_percorrida * consumo;
-					System.out.println("Combustivel atual: " + combustivel_atual);
+					/*	System.out.println("Combustivel atual: " + combustivel_atual);*/
 				}
 			}
 		}
 	}
-	
+
 	protected class RecebePosição extends CyclicBehaviour{
 		public void action() {
 			ACLMessage mensagem= receive();
@@ -214,7 +214,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		}
 	}
 
-	private class EnviaInicio extends OneShotBehaviour{	
+	private class EnviaInicio extends OneShotBehaviour{
 		public void action() {
 			AID i= new AID();
 			i.setLocalName("AgenteCentral");
@@ -230,24 +230,36 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		}
 
 	}
-	
-	protected class EnviaPosicao extends TickerBehaviour{	
+
+	protected class EnviaPosicao extends TickerBehaviour{
 		public EnviaPosicao(Agent a, long period) {
 			super(a, period);
 		}
 		protected void onTick() {
-			AID i= new AID();
-			i.setLocalName("AgenteCentral");
-			ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
-			Agente a= new Agente(combustivel_atual,agua_atual,pos.getX(),pos.getY(),disponivel);
-			try {
-				msg.setContentObject(a);
-				msg.addReceiver(i);
-				send(msg);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (disponivel == false) {
+				AID i = new AID();
+				i.setLocalName("AgenteCentral");
+				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+				Agente a = new Agente(combustivel_atual, agua_atual, pos.getX(), pos.getY());
+				try {
+					msg.setContentObject(a);
+					msg.addReceiver(i);
+					send(msg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
+	private void enviaDisponivel(){
+		ACLMessage msg= new ACLMessage(ACLMessage.UNKNOWN);
+		AID central= new AID();
+		central.setLocalName("AgenteCentral");
+		msg.addReceiver(central);
+		String s1=this.getClass().toString();
+		msg.setContent(""+disponivel+" "+(s1.substring(s1.indexOf(".")+1)));
+		send(msg);
+	}
+
 }
