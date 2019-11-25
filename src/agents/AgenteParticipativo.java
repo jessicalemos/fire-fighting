@@ -159,14 +159,16 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					dist = Math.sqrt(Math.pow((dest.getX()-pos.getX()),2) + Math.pow((dest.getY()-dest.getY()),2));
 				}
 				int destino_dist = (int) dist;
-				if (abastecer_combustivel == true && destino_dist <= velocidade) {
+				if (incendio_extinto == true && abastecer_agua == false && abastecer_combustivel == false) {
+					disponivel = true;
+					enviaDisponivel();
+				}
+				else if (abastecer_combustivel == true && destino_dist <= velocidade) {
 					System.out.println("Cheguei ao combustível " + getAID().getLocalName());
 					pos.setX(dest.getX());
 					pos.setY(dest.getY());
 					combustivel_atual = combustivel_max;
 					abastecer_combustivel = false;
-					disponivel = true;
-					enviaDisponivel();
 					System.out.println("Abasteci " + getAID().getLocalName() + " tenho combustivel: " + combustivel_atual);
 				}
 				else if (abastecer_agua == true && abastecer_combustivel == false && destino_dist <= velocidade) {
@@ -175,8 +177,6 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					pos.setY(dest.getY());
 					abastecer_agua = false;
 					agua_atual = agua_max;
-					disponivel = true;
-					enviaDisponivel();
 					System.out.println("Abasteci " + getAID().getLocalName() + " tenho agua: " + agua_atual);
 				}
 				else if (destino_dist <= velocidade && incendio_extinto==false) {
