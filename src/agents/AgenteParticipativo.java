@@ -194,7 +194,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());
 					int dist_percorrida = (int) Math.sqrt(Math.pow(cenas_x, 2) + Math.pow(cenas_y, 2));
 					combustivel_atual -= dist_percorrida * consumo;
-					/*	System.out.println("Combustivel atual: " + combustivel_atual);*/
+					System.out.println("Combustivel atual: " + combustivel_atual);
 				}
 			}
 		}

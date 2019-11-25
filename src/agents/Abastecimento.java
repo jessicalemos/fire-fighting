@@ -12,10 +12,19 @@ public class Abastecimento implements Serializable {
 	public Abastecimento() {
 		this.local_agua = new ArrayList<>();
 		this.local_combustivel = new ArrayList<>();
-		for(int i=0; i<5; i++) {
-			Random randomizer = new Random();
-			local_agua.add(new Posicao(randomizer.nextInt(500),randomizer.nextInt(500)));
-			local_combustivel.add(new Posicao(randomizer.nextInt(500),randomizer.nextInt(500)));
+		Random randomizer = new Random();
+		int x_rand, y_rand;
+		for (int y=0; y<500; y+=125) {
+			for(int x=0; x<500; x+=125) {
+				for(int w=0; w<2; w++) {
+					x_rand = x + randomizer.nextInt(((x+125) - x) + 1);
+					y_rand = y + randomizer.nextInt(((y+125) - y) + 1);
+					local_agua.add(new Posicao(x_rand,y_rand));
+					x_rand = x + randomizer.nextInt(((x+125) - x) + 1);
+					y_rand = y + randomizer.nextInt(((y+125) - y) + 1);
+					local_combustivel.add(new Posicao(x_rand,y_rand));
+				}
+			}
 		}
 	}
 
