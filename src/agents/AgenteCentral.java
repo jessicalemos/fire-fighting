@@ -37,12 +37,12 @@ public class AgenteCentral extends Agent {
 
 	private class RecebePosicao extends CyclicBehaviour {
 		public void action() {
-			ACLMessage mensagem= receive();
-			if (mensagem!=null) {
+			ACLMessage msg = receive();
+			if (msg !=null) {
 				try {
-					if(mensagem.getContentObject() instanceof Agente) {
-						Agente c= (Agente) mensagem.getContentObject();
-						AID sender=mensagem.getSender();
+					if(msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Agente) {
+						Agente c= (Agente) msg.getContentObject();
+						AID sender=msg.getSender();
 						AgenteParticipativo x=agentesCombate.get(sender);
 						x.setAgua(c.getAgua());
 						x.setCombustivel(c.getCombustivel());
@@ -50,34 +50,44 @@ public class AgenteCentral extends Agent {
 						agentesCombate.put(sender,x);
 						System.out.println("Guardei informacao do "+sender.getLocalName()+ " "+ x.disponivel);
 					}
-					else if (mensagem.getContentObject() instanceof Incendio) {
-
-						Incendio c = (Incendio) mensagem.getContentObject();
+					else if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
+						Incendio c = (Incendio) msg.getContentObject();
 						System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getPos().getX() + " " + c.getPos().getY() + "\n");
 						incendiosAtivos.add(c);
 					}
-					else if (mensagem.getContentObject() instanceof AgenteParticipativo) {
-						AgenteParticipativo c= (AgenteParticipativo) mensagem.getContentObject();
-						AID sender=mensagem.getSender();
+					else if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof AgenteParticipativo) {
+						AgenteParticipativo c= (AgenteParticipativo) msg.getContentObject();
+						AID sender=msg.getSender();
 						agentesCombate.put(sender,c);
 						System.out.println("Guardei informacao do "+sender.getLocalName());
 					}
-				} catch (Exception e) {
-					String a= mensagem.getContent();
-					AID sender= mensagem.getSender();
-					AgenteParticipativo x = agentesCombate.get(sender);
-					String[] lista = a.split(" ");
-					if (lista[0].equals("true")) {
-						x.setDisponivel(true);
-						atualizaContadores(lista[1].trim());
+					else if (msg.getPerformative() == ACLMessage.CONFIRM) {
+						int incendio = Integer.parseInt(msg.getContent());
+						System.out.println("Confirmado extinção incendio " + incendio);
+						//tirar comentário quando o arraylist estiver correto
+						//incendiosAtivos.get(incendio).setExtinto(true);
 					}
-					else x.setDisponivel(false);
-					agentesCombate.put(sender,x);
-					System.out.println("disponivel"+ x.getLocalName()+" "+x.disponivel+" "+a.trim());
+					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
+						String a= msg.getContent();
+						AID sender= msg.getSender();
+						AgenteParticipativo x = agentesCombate.get(sender);
+						String[] lista = a.split(" ");
+						if (lista[0].equals("true")) {
+							x.setDisponivel(true);
+							atualizaContadores(lista[1].trim());
+						}
+						else x.setDisponivel(false);
+						agentesCombate.put(sender,x);
+						System.out.println("Disponivel"+ x.getLocalName()+" "+x.disponivel+" "+a.trim());
+					}
+				} catch (UnreadableException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}
 	}
+	
 	private class EnviaCombate extends CyclicBehaviour {
 		public void action() {
 			int incendios=incendiosAtivos.size();
@@ -95,12 +105,12 @@ public class AgenteCentral extends Agent {
 					m = DisponivelMaisRapido(xinc, yinc,a.getGravidade());
 				}
 				if (m.getPos().getX()!=-99) {
-					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-					msg.setContent(xinc + ";" + yinc);
+					ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+					msg.setContent(i + ";" + xinc + ";" + yinc);
 					msg.addReceiver(m.getAID());
 					send(msg);
 					incendiosAtivos.remove(a);
-					System.out.println("enviei combate " + xinc + " " + yinc + " " + m.getLocalName());
+					System.out.println("Enviei combate " + i + " " + xinc + " " + yinc + " " + m.getLocalName());
 					m.disponivel = false;
 					agentesCombate.put(m.getAID(), m);
 					eliminaAgenteContador(m);
@@ -108,7 +118,6 @@ public class AgenteCentral extends Agent {
 			}
 		}
 	}
-
 
 	public AgenteParticipativo DisponivelMaisRapido(int x, int y,int gravidade) {
 		AgenteParticipativo erro =new AgenteParticipativo();

@@ -22,7 +22,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 	protected int agua_max;
 	protected int velocidade;
 	protected Posicao pos;
-	protected Posicao dest = new Posicao(100,100);
+	protected Posicao dest;
 	protected List<Posicao> local_agua;
 	protected List<Posicao> local_combustivel;
 	protected double consumo;
@@ -31,6 +31,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 	protected boolean abastecer_combustivel;
 	protected Posicao agua_pos;
 	protected Posicao combustivel_pos;
+	protected int id_incendio;
 
 	public boolean getDisponivel() {
 		return disponivel;
@@ -161,7 +162,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 				int destino_dist = (int) dist;
 				if (incendio_extinto == true && abastecer_agua == false && abastecer_combustivel == false) {
 					disponivel = true;
-					enviaDisponivel();
+					myAgent.addBehaviour(new EnviaDisponivel());
 				}
 				else if (abastecer_combustivel == true && destino_dist <= velocidade) {
 					System.out.println("Cheguei ao combustível " + getAID().getLocalName());
@@ -184,17 +185,18 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					pos.setY(dest.getY());
 					agua_atual--;
 					incendio_extinto = true;
+					myAgent.addBehaviour(new EnviaInfoIncendio());
 					System.out.println("Em abastacimento "+ getAID().getLocalName() + " agua "+agua_atual);
 					VerificaAbastecimento();
 				} else {
-					int cenas_x = (int) (velocidade * (dest.getX() - pos.getX()) / dist);
-					int cenas_y = (int) (velocidade * (dest.getY() - pos.getY()) / dist);
+					int cenas_x = (int) (velocidade * (dest.getX() - pos.getX()) / dist) + 1;
+					int cenas_y = (int) (velocidade * (dest.getY() - pos.getY()) / dist) + 1;
 					pos.setX(pos.getX() + cenas_x);
 					pos.setY(pos.getY() + cenas_y);
 					System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());
 					int dist_percorrida = (int) Math.sqrt(Math.pow(cenas_x, 2) + Math.pow(cenas_y, 2));
 					combustivel_atual -= dist_percorrida * consumo;
-					System.out.println("Combustivel atual: " + combustivel_atual);
+					System.out.println("Combustivel atual: " + combustivel_atual+" "+dist_percorrida);
 				}
 			}
 		}
@@ -205,10 +207,12 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			ACLMessage mensagem= receive();
 			if (mensagem!=null) {
 				String[] coords = mensagem.getContent().split(";");
-				dest = new Posicao(Integer.parseInt(coords[0]),Integer.parseInt(coords[1]));
+				dest = new Posicao(Integer.parseInt(coords[1]),Integer.parseInt(coords[2]));
 				disponivel = false;
 				incendio_extinto = false;
 				System.out.println("Agente " + getAID().getLocalName() + " recebeu incêndio -> coords " + dest.getX() + " " + dest.getY());
+				id_incendio = Integer.parseInt(coords[0]);
+				System.out.println("Id incendio: "+id_incendio);
 			}
 		}
 	}
@@ -251,14 +255,28 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			}
 		}
 	}
-	private void enviaDisponivel(){
-		ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
-		AID central= new AID();
-		central.setLocalName("AgenteCentral");
-		msg.addReceiver(central);
-		String s1=this.getClass().toString();
-		msg.setContent(""+disponivel+" "+(s1.substring(s1.indexOf(".")+1)));
-		send(msg);
+	
+	private class EnviaInfoIncendio extends OneShotBehaviour {
+		public void action() {
+			ACLMessage msg = new ACLMessage(ACLMessage.CONFIRM);
+			AID central = new AID();
+			central.setLocalName("AgenteCentral");
+			msg.addReceiver(central);
+			msg.setContent(""+id_incendio);
+			send(msg);
+			System.out.println("Confirmo incendio " + id_incendio + " extinto");
+		}
 	}
-
+	
+	private class EnviaDisponivel extends OneShotBehaviour {
+		public void action() {
+			ACLMessage msg= new ACLMessage(ACLMessage.INFORM_IF);
+			AID central = new AID();
+			central.setLocalName("AgenteCentral");
+			msg.addReceiver(central);
+			String s1=this.getClass().toString();
+			msg.setContent(""+disponivel+" "+(s1.substring(s1.indexOf(".")+1)));
+			send(msg);
+		}
+	}
 }
