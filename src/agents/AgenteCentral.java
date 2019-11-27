@@ -4,6 +4,7 @@ import jade.core.Agent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import jade.content.ContentElement;
 import jade.content.lang.Codec.CodecException;
@@ -21,7 +22,7 @@ import jade.lang.acl.UnreadableException;
 
 public class AgenteCentral extends Agent {
 	private HashMap<AID,Agente> agentesParticipativos;
-	private List<Incendio> incendiosAtivos;
+	private List<Incendio> incendios;
 	private int drones;
 	private int aeronaves;
 	private int camioes;
@@ -29,7 +30,7 @@ public class AgenteCentral extends Agent {
 	protected void setup() {
 		super.setup();
 		drones=10;aeronaves=5;camioes=2;
-		this.incendiosAtivos = new ArrayList<Incendio>();
+		this.incendios = new ArrayList<Incendio>();
 		this.agentesParticipativos = new HashMap<AID,Agente>();
 		this.addBehaviour(new RecebePosicao());
 		this.addBehaviour(new EnviaCombate());
@@ -49,7 +50,7 @@ public class AgenteCentral extends Agent {
 							x.setCombustivel(c.getCombustivel());
 							x.setPos(c.getPos());
 							agentesParticipativos.put(sender,x);
-							System.out.println("Guardei informacao do "+sender.getLocalName()+ " ");
+							System.out.println("Guardei informacao do "+sender.getLocalName()+ " " + x.isDisponibilidade());
 						}
 						else {
 							agentesParticipativos.put(sender, c);
@@ -59,13 +60,12 @@ public class AgenteCentral extends Agent {
 					else if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
 						Incendio c = (Incendio) msg.getContentObject();
 						System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getPos().getX() + " " + c.getPos().getY() + "\n");
-						incendiosAtivos.add(c);
+						incendios.add(c);
 					}
 					else if (msg.getPerformative() == ACLMessage.CONFIRM) {
 						int incendio = Integer.parseInt(msg.getContent());
 						System.out.println("Confirmado extinção incendio " + incendio);
-						//tirar comentário quando o arraylist estiver correto
-						//incendiosAtivos.get(incendio).setExtinto(true);
+						incendios.get(incendio).setExtinto(2);
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
 						String a= msg.getContent();
@@ -74,11 +74,11 @@ public class AgenteCentral extends Agent {
 						String[] lista = a.split(" ");
 						if (lista[0].equals("true")) {
 							x.setDisponibilidade(true);
-							atualizaContadores(lista[1].trim());
+							incrementaContadores(lista[1].trim());
 						}
 						else x.setDisponibilidade(false);
 						agentesParticipativos.put(sender,x);
-						System.out.println("Disponivel"+ sender.getLocalName()+" "+x.isDisponibilidade()+" "+a.trim());
+						System.out.println("Disponivel "+ sender.getLocalName()+" "+x.isDisponibilidade()+" "+a.trim());
 					}
 				} catch (UnreadableException e) {
 					// TODO Auto-generated catch block
@@ -90,30 +90,27 @@ public class AgenteCentral extends Agent {
 	
 	private class EnviaCombate extends CyclicBehaviour {
 		public void action() {
-			int incendios=incendiosAtivos.size();
-			int i=0;
-			if (incendios > 0) {
-				Incendio a = incendiosAtivos.get(i);
-				int xinc = a.getPos().getX();
-				int yinc = a.getPos().getY();
-				Agente m = DisponivelMaisRapido(xinc,yinc,a.getGravidade());
-				while (m == null && (drones>0||camioes>0||aeronaves>0) && i+1<incendios) {
-					i++;
-					a = incendiosAtivos.get(i);
-					xinc = a.getPos().getX();
-					yinc = a.getPos().getY();
-					m = DisponivelMaisRapido(xinc, yinc,a.getGravidade());
-				}
-				if (m != null) {
-					ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-					msg.setContent(i + ";" + xinc + ";" + yinc);
-					msg.addReceiver(m.getAgente());
-					send(msg);
-					incendiosAtivos.remove(a);
-					System.out.println("Enviei combate " + i + " " + xinc + " " + yinc + " " +  m.getAgente().getLocalName());
-					m.setDisponibilidade(false);
-					agentesParticipativos.put(m.getAgente(), m);
-					decrementaContador(m);
+			if (incendios.size()!=0) {
+				int i=0;
+				while(i<incendios.size()) {
+					Incendio a = incendios.get(i);
+					if(a.getExtinto()==0) {
+						int xinc = a.getPos().getX();
+						int yinc = a.getPos().getY();
+						Agente m = DisponivelMaisRapido(xinc,yinc,a.getGravidade());
+						if (m != null) {
+							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+							msg.setContent(i + ";" + xinc + ";" + yinc);
+							msg.addReceiver(m.getAgente());
+							send(msg);
+							System.out.println("Enviei combate " + i + " " + xinc + " " + yinc + " " +  m.getAgente().getLocalName());
+							m.setDisponibilidade(false);
+							a.setExtinto(1);
+							agentesParticipativos.put(m.getAgente(), m);
+							decrementaContador(m);
+						} 
+						i++;
+					} else i++;
 				}
 			}
 		}
@@ -149,10 +146,10 @@ public class AgenteCentral extends Agent {
 		else if (x.getTipo() == 3) camioes--;
 		else if (x.getTipo() == 2) aeronaves--;
 	}
-	private void atualizaContadores(String a){
+	
+	private void incrementaContadores(String a){
 		if (a.equals("Drone")) drones++;
 		else if (a.equals("Camiao")) camioes++;
 		else if (a.equals("Aeronave")) aeronaves++;
 	}
-
 }

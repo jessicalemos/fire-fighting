@@ -18,3 +18,7 @@
 /AgenteParticipativo$EnviaInfoIncendio.class
 /AgenteCentral$RecebeInformacao.class
 /AgenteParticipativo$EnviaDisponivel.class
+/AgenteParticipativo$EnviaInfo.class
+/AgenteParticipativo$Movimento$EnviaInfo.class
+/AgenteParticipativo$Movimento$EnviaPosicao.class
+/AgenteParticipativo$Movimento$RecebePosição.class

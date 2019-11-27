@@ -3,19 +3,19 @@ package agents;
 import java.io.Serializable;
 
 public class Incendio implements Serializable{
-	private boolean extinto;
+	private int extinto; //0 - ativo, 1 - em combate, 2 - extinto
 	private int gravidade;
 	private Posicao pos;
 
 	public Incendio() {
-		this.extinto = false;
-		this.gravidade=0;
+		this.extinto = 0;
+		this.gravidade = 0;
 		this.pos = new Posicao(0,0);
 	}
 
 	public Incendio(int gravidade, int pos_x, int pos_y) {
 		super();
-		this.extinto = false;
+		this.extinto = 0;
 		this.gravidade = gravidade;
 		this.pos = new Posicao(pos_x,pos_y);
 	}
@@ -24,7 +24,7 @@ public class Incendio implements Serializable{
 		return gravidade;
 	}
 
-	public boolean getExtinto() {
+	public int getExtinto() {
 		return extinto;
 	}
 	
@@ -32,7 +32,7 @@ public class Incendio implements Serializable{
 		this.gravidade = gravidade;
 	}
 	
-	public void setExtinto(boolean extinto) {
+	public void setExtinto(int extinto) {
 		this.extinto = extinto;
 	}
 
@@ -44,5 +44,4 @@ public class Incendio implements Serializable{
 		this.pos.setX(pos.getX());
 		this.pos.setY(pos.getY());
 	}
-
 }
