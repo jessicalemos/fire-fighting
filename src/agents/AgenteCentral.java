@@ -20,7 +20,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 
 public class AgenteCentral extends Agent {
-	private HashMap<AID,AgenteParticipativo> agentesCombate;
+	private HashMap<AID,Agente> agentesParticipativos;
 	private List<Incendio> incendiosAtivos;
 	private int drones;
 	private int aeronaves;
@@ -30,7 +30,7 @@ public class AgenteCentral extends Agent {
 		super.setup();
 		drones=10;aeronaves=5;camioes=2;
 		this.incendiosAtivos = new ArrayList<Incendio>();
-		this.agentesCombate= new HashMap<AID,AgenteParticipativo>();
+		this.agentesParticipativos = new HashMap<AID,Agente>();
 		this.addBehaviour(new RecebePosicao());
 		this.addBehaviour(new EnviaCombate());
 	}
@@ -41,25 +41,25 @@ public class AgenteCentral extends Agent {
 			if (msg !=null) {
 				try {
 					if(msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Agente) {
-						Agente c= (Agente) msg.getContentObject();
-						AID sender=msg.getSender();
-						AgenteParticipativo x=agentesCombate.get(sender);
-						x.setAgua(c.getAgua());
-						x.setCombustivel(c.getCombustivel());
-						x.setPos(c.getPos());
-						agentesCombate.put(sender,x);
-						System.out.println("Guardei informacao do "+sender.getLocalName()+ " "+ x.disponivel);
+						Agente c = (Agente) msg.getContentObject();
+						AID sender = msg.getSender();
+						if(agentesParticipativos.containsKey(sender)) {
+							Agente x = agentesParticipativos.get(sender);
+							x.setAgua(c.getAgua());
+							x.setCombustivel(c.getCombustivel());
+							x.setPos(c.getPos());
+							agentesParticipativos.put(sender,x);
+							System.out.println("Guardei informacao do "+sender.getLocalName()+ " ");
+						}
+						else {
+							agentesParticipativos.put(sender, c);
+							System.out.println("Guardei informacao do " + sender.getLocalName());
+						}
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
 						Incendio c = (Incendio) msg.getContentObject();
 						System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getPos().getX() + " " + c.getPos().getY() + "\n");
 						incendiosAtivos.add(c);
-					}
-					else if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof AgenteParticipativo) {
-						AgenteParticipativo c= (AgenteParticipativo) msg.getContentObject();
-						AID sender=msg.getSender();
-						agentesCombate.put(sender,c);
-						System.out.println("Guardei informacao do "+sender.getLocalName());
 					}
 					else if (msg.getPerformative() == ACLMessage.CONFIRM) {
 						int incendio = Integer.parseInt(msg.getContent());
@@ -70,15 +70,15 @@ public class AgenteCentral extends Agent {
 					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
 						String a= msg.getContent();
 						AID sender= msg.getSender();
-						AgenteParticipativo x = agentesCombate.get(sender);
+						Agente x = agentesParticipativos.get(sender);
 						String[] lista = a.split(" ");
 						if (lista[0].equals("true")) {
-							x.setDisponivel(true);
+							x.setDisponibilidade(true);
 							atualizaContadores(lista[1].trim());
 						}
-						else x.setDisponivel(false);
-						agentesCombate.put(sender,x);
-						System.out.println("Disponivel"+ x.getLocalName()+" "+x.disponivel+" "+a.trim());
+						else x.setDisponibilidade(false);
+						agentesParticipativos.put(sender,x);
+						System.out.println("Disponivel"+ sender.getLocalName()+" "+x.isDisponibilidade()+" "+a.trim());
 					}
 				} catch (UnreadableException e) {
 					// TODO Auto-generated catch block
@@ -96,40 +96,38 @@ public class AgenteCentral extends Agent {
 				Incendio a = incendiosAtivos.get(i);
 				int xinc = a.getPos().getX();
 				int yinc = a.getPos().getY();
-				AgenteParticipativo m = DisponivelMaisRapido(xinc,yinc,a.getGravidade());
-				while (m.getPos().getX()==-99 && (drones>0||camioes>0||aeronaves>0) && i+1<incendios) {
+				Agente m = DisponivelMaisRapido(xinc,yinc,a.getGravidade());
+				while (m == null && (drones>0||camioes>0||aeronaves>0) && i+1<incendios) {
 					i++;
 					a = incendiosAtivos.get(i);
 					xinc = a.getPos().getX();
 					yinc = a.getPos().getY();
 					m = DisponivelMaisRapido(xinc, yinc,a.getGravidade());
 				}
-				if (m.getPos().getX()!=-99) {
+				if (m != null) {
 					ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 					msg.setContent(i + ";" + xinc + ";" + yinc);
-					msg.addReceiver(m.getAID());
+					msg.addReceiver(m.getAgente());
 					send(msg);
 					incendiosAtivos.remove(a);
-					System.out.println("Enviei combate " + i + " " + xinc + " " + yinc + " " + m.getLocalName());
-					m.disponivel = false;
-					agentesCombate.put(m.getAID(), m);
-					eliminaAgenteContador(m);
+					System.out.println("Enviei combate " + i + " " + xinc + " " + yinc + " " +  m.getAgente().getLocalName());
+					m.setDisponibilidade(false);
+					agentesParticipativos.put(m.getAgente(), m);
+					decrementaContador(m);
 				}
 			}
 		}
 	}
 
-	public AgenteParticipativo DisponivelMaisRapido(int x, int y,int gravidade) {
-		AgenteParticipativo erro =new AgenteParticipativo();
-		Posicao k = new Posicao(-99,0);
-		erro.setPos(k);
-		int dron = this.drones;
-		double min = 10000;
-		for (AgenteParticipativo l : agentesCombate.values()) {
-			if (l.disponivel==true && consegueChegar(l, x, y)) {
+	public Agente DisponivelMaisRapido(int x, int y,int gravidade) {
+		Agente erro = null;
+		double min = 1000;
+		for (Agente l : agentesParticipativos.values()) {
+			if (l.isDisponibilidade() == true && consegueChegar(l, x, y)) {
 				double dist = Math.sqrt(Math.pow((l.getPos().getX() - x), 2) + Math.pow((l.getPos().getY() - y), 2));
 				double tempo = (dist / l.getVelocidade());
-				if ((min > tempo && ((dron > 5) || (gravidade>=3))) || (min > tempo && dron <= 5 &&  (l instanceof Camiao || l instanceof Aeronave))) {
+				if ((min > tempo && ((this.drones > 5) || (gravidade>=3))) || (min > tempo && this.drones <= 5 &&  (l.getTipo() == 2 || l.getTipo() == 3))) {
+					erro = new Agente();
 					min = tempo;
 					erro = l;
 				}
@@ -138,18 +136,18 @@ public class AgenteCentral extends Agent {
 		return erro;
 	}
 
-	public Boolean consegueChegar(AgenteParticipativo agent, int x, int y) {
+	public Boolean consegueChegar(Agente agent, int x, int y) {
 		int xagent = agent.getPos().getX();
 		int yagent = agent.getPos().getY();
 		boolean fim = false;
 		double dist = Math.sqrt(Math.pow((xagent - x), 2) + Math.pow((yagent - y), 2));
-		if (dist * agent.consumo < agent.getCombustivel()) fim = true;
+		if (dist * agent.getConsumo() < agent.getCombustivel()) fim = true;
 		return fim;
 	}
-	private void eliminaAgenteContador(AgenteParticipativo x){
-		if (x instanceof Drone) drones--;
-		else if (x instanceof Camiao) camioes--;
-		else if (x instanceof  Aeronave) aeronaves--;
+	private void decrementaContador(Agente x){
+		if (x.getTipo() == 1) drones--;
+		else if (x.getTipo() == 3) camioes--;
+		else if (x.getTipo() == 2) aeronaves--;
 	}
 	private void atualizaContadores(String a){
 		if (a.equals("Drone")) drones++;

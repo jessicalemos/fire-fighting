@@ -95,7 +95,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		sd.setType("combate");
 		sd.setName(getLocalName());
 		dfd.addServices(sd);
-		this.addBehaviour(new EnviaInicio());
+		this.addBehaviour(new EnviaInfo());
 		this.addBehaviour(new EnviaPosicao(this,5000));
 		this.addBehaviour(new Movimento(this, 1000));
 		this.addBehaviour(new RecebePosição());
@@ -217,13 +217,18 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		}
 	}
 
-	private class EnviaInicio extends OneShotBehaviour{
+	private class EnviaInfo extends OneShotBehaviour{
 		public void action() {
 			AID i= new AID();
 			i.setLocalName("AgenteCentral");
 			ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
 			try {
-				msg.setContentObject(myAgent);
+				int tipo;
+				if(myAgent instanceof Drone) tipo = 1;
+				else if (myAgent instanceof Aeronave) tipo = 2;
+				else tipo = 3;
+				Agente a = new Agente(getAID(), combustivel_atual, agua_atual, pos.getX(), pos.getY(), disponivel, velocidade, consumo, tipo);
+				msg.setContentObject(a);
 				msg.addReceiver(i);
 				send(msg);
 			} catch (IOException e) {
@@ -231,7 +236,6 @@ public class AgenteParticipativo extends Agent implements Serializable{
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	protected class EnviaPosicao extends TickerBehaviour{
