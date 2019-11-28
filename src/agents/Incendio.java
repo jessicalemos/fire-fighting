@@ -6,7 +6,8 @@ public class Incendio implements Serializable{
 	private int extinto; //0 - ativo, 1 - em combate, 2 - extinto
 	private int gravidade;
 	private Posicao pos;
-
+	private long time;
+	
 	public Incendio() {
 		this.extinto = 0;
 		this.gravidade = 0;
@@ -18,6 +19,15 @@ public class Incendio implements Serializable{
 		this.extinto = 0;
 		this.gravidade = gravidade;
 		this.pos = new Posicao(pos_x,pos_y);
+		this.time = 0;
+	}
+
+	public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
 	}
 
 	public int getGravidade() {

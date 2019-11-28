@@ -59,12 +59,17 @@ public class AgenteCentral extends Agent {
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
 						Incendio c = (Incendio) msg.getContentObject();
+						long inicio = System.currentTimeMillis();
+						c.setTime(inicio);
 						System.out.println("Vou registar o incendio:" + c.getGravidade() + " " + c.getPos().getX() + " " + c.getPos().getY() + "\n");
 						incendios.add(c);
 					}
 					else if (msg.getPerformative() == ACLMessage.CONFIRM) {
 						int incendio = Integer.parseInt(msg.getContent());
-						System.out.println("Confirmado extinção incendio " + incendio);
+						Incendio i = incendios.get(incendio);
+						long fim = System.currentTimeMillis();
+						long duracao = fim - i.getTime();
+						System.out.println("Confirmado extinção incendio " + incendio + " duracao em ms " + duracao);
 						incendios.get(incendio).setExtinto(2);
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
@@ -123,7 +128,7 @@ public class AgenteCentral extends Agent {
 			if (l.isDisponibilidade() == true && consegueChegar(l, x, y)) {
 				double dist = Math.sqrt(Math.pow((l.getPos().getX() - x), 2) + Math.pow((l.getPos().getY() - y), 2));
 				double tempo = (dist / l.getVelocidade());
-				if ((min > tempo && ((this.drones > 5) || (gravidade>=3))) || (min > tempo && this.drones <= 5 &&  (l.getTipo() == 2 || l.getTipo() == 3))) {
+				if (min > tempo && !(l.getTipo() == 1 && this.drones<5 && gravidade<3)) {
 					erro = new Agente();
 					min = tempo;
 					erro = l;
