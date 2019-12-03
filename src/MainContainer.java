@@ -43,7 +43,7 @@ public class MainContainer {
 	
 	public void startAgentInPlatform(String name, String classpath) {
 		try {
-			AgentController ac = container.createNewAgent(name, classpath, new Object[0]);
+			AgentController ac = container.createNewAgent(name, classpath, new Object[] {new agents.Abastecimento()});
 			ac.start();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -53,15 +53,14 @@ public class MainContainer {
 	public static void main(String[] args) {
 		MainContainer a = new MainContainer();
 		a.initMainContainerInPlatform("localhost", "9999", "MainContainer");
-
 		a.startAgentInPlatform("AgenteCentral", "agents.AgenteCentral");
 		a.startAgentInPlatform("AgenteSecundario", "agents.AgenteSecundario");
-		a.startAgentInPlatform("AgenteParticipativo", "agents.Drone");
+		//a.startAgentInPlatform("AgenteParticipativo", "agents.Drone");
 		for(int i = 0; i<10; i++)
 			a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Drone");
-		for(int i = 10; i<12; i++)
-			a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Aeronave");
-		for(int i = 12; i<17; i++)
-			a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Camiao");
+		//for(int i = 10; i<12; i++)
+			//a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Aeronave");
+		//for(int i = 12; i<17; i++)
+		//a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Camiao");
 	}
 }

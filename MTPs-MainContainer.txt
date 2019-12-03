@@ -1,1 +1,1 @@
-http://172.26.25.67:7778/acc
+http://utilizador-HP-Pavilion-Laptop-15-ck0xx:7778/acc

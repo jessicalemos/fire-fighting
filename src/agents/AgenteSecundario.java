@@ -40,33 +40,30 @@ public class AgenteSecundario extends Agent {
 		public GerarIncendio(Agent a, long period) {
 			super(a, period);
 		}
-		
+
 		protected void onTick() {
 			Random randomizer = new Random();
-			gravidade = randomizer.nextInt(3);
+			gravidade = randomizer.nextInt(3) + 1;
 			pos_x = randomizer.nextInt(500);
 			pos_y = randomizer.nextInt(500);
-			myAgent.addBehaviour(new EnviaIncendio());	
+			EnviaIncendio();
 		}
 	}
-	
-	private class EnviaIncendio extends OneShotBehaviour {	
-		public void action() {
-				ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
-				msg.addReceiver(agente_central);
-				Incendio atual= new Incendio(gravidade,pos_x,pos_y);
-				try {
-					msg.setContentObject(atual);
-				}catch (IOException e) {
-					// TODO Auto-generated catch blockSyz
-					e.printStackTrace();
-				}
-				myAgent.send(msg);
-				System.out.print("Gerei o incendio:" + gravidade + " " + pos_x + " " + pos_y + "\n");
-				
+
+	private void EnviaIncendio(){
+		ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
+		msg.addReceiver(agente_central);
+		Incendio atual= new Incendio(gravidade,pos_x,pos_y);
+		try {
+			msg.setContentObject(atual);
+		}catch (IOException e) {
+			// TODO Auto-generated catch blockSyz
+			e.printStackTrace();
 		}
+		send(msg);
+		System.out.print("Gerei o incendio:" + gravidade + " " + pos_x + " " + pos_y + "\n");
 	}
-	
+
 	protected void takeDown() {
 		try {
 			DFService.deregister(this);

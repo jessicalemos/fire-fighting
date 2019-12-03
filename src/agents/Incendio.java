@@ -3,40 +3,55 @@ package agents;
 import java.io.Serializable;
 
 public class Incendio implements Serializable{
-
+	private int extinto; //0 - ativo, 1 - em combate, 2 - extinto
 	private int gravidade;
-	private int pos_x;
-	private int pos_y;
-
+	private Posicao pos;
+	private long time;
+	
 	public Incendio() {
-		this.gravidade=0;
-		this.pos_x=0;
-		this.pos_y=0;
+		this.extinto = 0;
+		this.gravidade = 0;
+		this.pos = new Posicao(0,0);
 	}
 
 	public Incendio(int gravidade, int pos_x, int pos_y) {
 		super();
+		this.extinto = 0;
 		this.gravidade = gravidade;
-		this.pos_x = pos_x;
-		this.pos_y = pos_y;
+		this.pos = new Posicao(pos_x,pos_y);
+		this.time = 0;
+	}
+
+	public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
 	}
 
 	public int getGravidade() {
 		return gravidade;
 	}
+
+	public int getExtinto() {
+		return extinto;
+	}
+	
 	public void setGravidade(int gravidade) {
 		this.gravidade = gravidade;
 	}
-	public int getpos_x() {
-		return pos_x;
+	
+	public void setExtinto(int extinto) {
+		this.extinto = extinto;
 	}
-	public void setpos_x(int pos_x) {
-		this.pos_x = pos_x;
+
+	public Posicao getPos() {
+		return pos;
 	}
-	public int getpos_y() {
-		return pos_y;
-	}
-	public void setpos_y(int pos_y) {
-		this.pos_y = pos_y;
+
+	public void setpos_x(Posicao pos) {
+		this.pos.setX(pos.getX());
+		this.pos.setY(pos.getY());
 	}
 }
