@@ -71,6 +71,7 @@ public class AgenteCentral extends Agent {
 						long duracao = fim - i.getTime();
 						System.out.println("Confirmado extinção incendio " + incendio + " duracao em ms " + duracao);
 						incendios.get(incendio).setExtinto(2);
+						System.out.println("Bora ver, é 2! :" + incendios.get(incendio).getExtinto());
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
 						String a= msg.getContent();
@@ -120,6 +121,12 @@ public class AgenteCentral extends Agent {
 			}
 		}
 	}
+	
+	public boolean agente_reserva(Agente l) {
+		String agente = "AgenteParticipativo ";
+		String local_name = l.getAgente().getLocalName();
+		return local_name.equals(agente+9) || local_name.equals(agente+10) || local_name.equals(agente+16);
+	}
 
 	public Agente DisponivelMaisRapido(int x, int y,int gravidade) {
 		Agente erro = null;
@@ -128,10 +135,14 @@ public class AgenteCentral extends Agent {
 			if (l.isDisponibilidade() == true && consegueChegar(l, x, y)) {
 				double dist = Math.sqrt(Math.pow((l.getPos().getX() - x), 2) + Math.pow((l.getPos().getY() - y), 2));
 				double tempo = (dist / l.getVelocidade());
-				if (min > tempo && !(l.getTipo() == 1 && this.drones<5 && gravidade<3)) {
+				if (min > tempo && gravidade<3 && !agente_reserva(l)) {
 					erro = new Agente();
 					min = tempo;
 					erro = l;
+				} else if (min > tempo && gravidade>3 && agente_reserva(l)) {
+						erro = new Agente();
+						min = tempo;
+						erro = l;
 				}
 			}
 		}
@@ -144,6 +155,9 @@ public class AgenteCentral extends Agent {
 		boolean fim = false;
 		double dist = Math.sqrt(Math.pow((xagent - x), 2) + Math.pow((yagent - y), 2));
 		if (dist * agent.getConsumo() < agent.getCombustivel()) fim = true;
+		if (fim == false) {
+			System.out.println("Não consegue!");
+		}
 		return fim;
 	}
 	private void decrementaContador(Agente x){
