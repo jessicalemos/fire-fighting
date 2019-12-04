@@ -289,6 +289,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		System.out.println("Confirmo incendio " + id_incendio + " extinto");
 	}
 	
+	
 	private void EnviaDisponivel() {
 		ACLMessage msg= new ACLMessage(ACLMessage.INFORM_IF);
 		AID central = new AID();

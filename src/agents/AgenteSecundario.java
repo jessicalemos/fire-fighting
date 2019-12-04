@@ -16,11 +16,14 @@ public class AgenteSecundario extends Agent {
 	private int pos_x;
 	private int pos_y;
 	private AID agente_central;
+	private AID agente_interface;
 
 	protected void setup() {
 		super.setup();
 		agente_central = new AID();
 		agente_central.setLocalName("AgenteCentral");
+		agente_interface = new AID();
+		agente_interface.setLocalName("AgenteInterface");
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
@@ -52,18 +55,22 @@ public class AgenteSecundario extends Agent {
 
 	private void EnviaIncendio(){
 		ACLMessage msg= new ACLMessage(ACLMessage.INFORM);
+		ACLMessage msgi = new ACLMessage(ACLMessage.INFORM);
 		msg.addReceiver(agente_central);
+		msgi.addReceiver(agente_interface);
 		Incendio atual= new Incendio(gravidade,pos_x,pos_y);
 		try {
 			msg.setContentObject(atual);
+			msgi.setContentObject(atual);
 		}catch (IOException e) {
 			// TODO Auto-generated catch blockSyz
 			e.printStackTrace();
 		}
 		send(msg);
+		send(msgi);
 		System.out.print("Gerei o incendio:" + gravidade + " " + pos_x + " " + pos_y + "\n");
 	}
-
+	
 	protected void takeDown() {
 		try {
 			DFService.deregister(this);

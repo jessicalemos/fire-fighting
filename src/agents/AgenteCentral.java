@@ -71,6 +71,7 @@ public class AgenteCentral extends Agent {
 						long duracao = fim - i.getTime();
 						System.out.println("Confirmado extinção incendio " + incendio + " duracao em ms " + duracao);
 						incendios.get(incendio).setExtinto(2);
+						informaExtinto(duracao, incendio);
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
 						String a= msg.getContent();
@@ -169,5 +170,14 @@ public class AgenteCentral extends Agent {
 		if (a.equals("Drone")) drones++;
 		else if (a.equals("Camiao")) camioes++;
 		else if (a.equals("Aeronave")) aeronaves++;
+	}
+	
+	private void informaExtinto(long duracao, int idIncendio){
+		ACLMessage msg= new ACLMessage(ACLMessage.CONFIRM);
+		AID agente_interface = new AID();
+		agente_interface.setLocalName("AgenteInterface");
+		msg.addReceiver(agente_interface);
+		msg.setContent("" + idIncendio + ";" + duracao);
+		send(msg);
 	}
 }
