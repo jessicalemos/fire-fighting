@@ -29,7 +29,7 @@ public class AgenteCentral extends Agent {
 
 	protected void setup() {
 		super.setup();
-		drones=10;aeronaves=5;camioes=2;
+		drones=10;aeronaves=2;camioes=5;
 		this.incendios = new ArrayList<Incendio>();
 		this.agentesParticipativos = new HashMap<AID,Agente>();
 		this.addBehaviour(new RecebePosicao());
@@ -71,7 +71,6 @@ public class AgenteCentral extends Agent {
 						long duracao = fim - i.getTime();
 						System.out.println("Confirmado extinção incendio " + incendio + " duracao em ms " + duracao);
 						incendios.get(incendio).setExtinto(2);
-						System.out.println("Bora ver, é 2! :" + incendios.get(incendio).getExtinto());
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
 						String a= msg.getContent();
@@ -139,7 +138,7 @@ public class AgenteCentral extends Agent {
 					erro = new Agente();
 					min = tempo;
 					erro = l;
-				} else if (min > tempo && gravidade>3 && agente_reserva(l)) {
+				} else if (min > tempo && gravidade==3) {
 						erro = new Agente();
 						min = tempo;
 						erro = l;
@@ -156,7 +155,7 @@ public class AgenteCentral extends Agent {
 		double dist = Math.sqrt(Math.pow((xagent - x), 2) + Math.pow((yagent - y), 2));
 		if (dist * agent.getConsumo() < agent.getCombustivel()) fim = true;
 		if (fim == false) {
-			System.out.println("Não consegue!");
+			//System.out.println("Não consegue!");
 		}
 		return fim;
 	}

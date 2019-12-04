@@ -148,7 +148,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			abastecer_combustivel = true;
 			System.out.println("No abastecimento "+combustivel_pos.getX() + " " + combustivel_pos.getY());
 		}
-		if (agua_atual*2 <= agua_max) {
+		if (agua_atual == 0) {
 			Posicao local_agua = AbastecimentoMaisProximo(0);
 			agua_pos = new Posicao(local_agua.getX(),local_agua.getY());
 			abastecer_agua = true;

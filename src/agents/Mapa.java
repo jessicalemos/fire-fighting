@@ -81,14 +81,14 @@ public class Mapa implements Serializable {
 		    		put(agent + (i+8), centro);
 		    	}
 		    	//aeronaves
+		    	put(agent + 10, zona1);
+		    	put(agent + 11, zona4);
+		    	//camioes
 		    	put(agent + 12, zona1);
 		    	put(agent + 13, zona2);
 		    	put(agent + 14, zona3);
 		    	put(agent + 15, zona4);
 		    	put(agent + 16, centro);
-		    	//camioes
-		    	put(agent + 10, zona1);
-		    	put(agent + 11, zona4);
 		    }
 		};
 	}
