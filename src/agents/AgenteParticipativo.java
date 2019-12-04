@@ -12,7 +12,9 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.HashMap;
 
 public class AgenteParticipativo extends Agent implements Serializable{
 	protected double combustivel_atual;
@@ -83,12 +85,26 @@ public class AgenteParticipativo extends Agent implements Serializable{
 	protected void setup() {
 		super.setup();
 		Object[] args = getArguments();
-		Abastecimento val = (Abastecimento) args[0];
+		Mapa val = (Mapa) args[0];
+		Map<String, List<Posicao>> zonas = val.get_agente_zonas();
+		List<Posicao> zona = zonas.get(getAID().getLocalName());
+		int min_x = 500;
+		int max_x = 0;
+		int min_y = 500;
+		int max_y = 0;
+		for(Posicao p : zona) {
+			min_x = Math.min(min_x,p.getX());
+			max_x = Math.max(max_x,p.getX());
+			min_y = Math.min(min_y,p.getX());
+			max_y = Math.max(max_y,p.getX());			
+		}
+		Random randomizer = new Random();
+		int x_rand = min_x + randomizer.nextInt(((max_x) - min_x) + 1);
+		int y_rand = min_y + randomizer.nextInt(((max_y) - min_y) + 1);
+		pos = new Posicao(x_rand,y_rand);
 		local_agua = val.get_agua();
 		local_combustivel = val.get_combustivel();
-		Random randomizer = new Random();
-		pos = new Posicao(randomizer.nextInt(500),randomizer.nextInt(500));
-		disponivel=true;
+		disponivel = true;
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
@@ -132,7 +148,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			abastecer_combustivel = true;
 			System.out.println("No abastecimento "+combustivel_pos.getX() + " " + combustivel_pos.getY());
 		}
-		if (agua_atual*2 <= agua_max) {
+		if (agua_atual == 0) {
 			Posicao local_agua = AbastecimentoMaisProximo(0);
 			agua_pos = new Posicao(local_agua.getX(),local_agua.getY());
 			abastecer_agua = true;

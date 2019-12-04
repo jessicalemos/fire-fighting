@@ -3,6 +3,7 @@ import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+import agents.Mapa;
 
 public class MainContainer {
 	Runtime rt;
@@ -43,7 +44,7 @@ public class MainContainer {
 	
 	public void startAgentInPlatform(String name, String classpath) {
 		try {
-			AgentController ac = container.createNewAgent(name, classpath, new Object[] {new agents.Abastecimento()});
+			AgentController ac = container.createNewAgent(name, classpath, new Object[] {new Mapa()});
 			ac.start();
 		} catch (Exception e) {
 			e.printStackTrace();
