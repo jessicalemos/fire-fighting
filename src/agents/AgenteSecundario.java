@@ -27,7 +27,7 @@ public class AgenteSecundario extends Agent {
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType("Partcipativo");
+		sd.setType("Participativo");
 		sd.setName(getLocalName());
 		dfd.addServices(sd);
 

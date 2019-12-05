@@ -102,6 +102,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		int x_rand = min_x + randomizer.nextInt(((max_x) - min_x) + 1);
 		int y_rand = min_y + randomizer.nextInt(((max_y) - min_y) + 1);
 		pos = new Posicao(x_rand,y_rand);
+		EnviaMovimento();
 		local_agua = val.get_agua();
 		local_combustivel = val.get_combustivel();
 		disponivel = true;
@@ -112,7 +113,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		sd.setName(getLocalName());
 		dfd.addServices(sd);
 		this.addBehaviour(new EnviaInfo());
-		this.addBehaviour(new EnviaPosicao(this,5000));
+		this.addBehaviour(new EnviaPosicao(this,1000));
 		this.addBehaviour(new Movimento(this, 1000));
 		this.addBehaviour(new RecebePosição());
 		try {
@@ -203,6 +204,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						pos.setY(dest.getY());
 						agua_atual--;
 						incendio_extinto = true;
+						EnviaMovimento();
 						InformIncendioExtinto();
 						System.out.println("Em abastacimento "+ getAID().getLocalName() + " agua "+agua_atual);
 						VerificaAbastecimento();
@@ -211,6 +213,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						int cenas_y = (int) (velocidade * (dest.getY() - pos.getY()) / dist) + 1;
 						pos.setX(pos.getX() + cenas_x);
 						pos.setY(pos.getY() + cenas_y);
+						EnviaMovimento();
 						System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());
 						int dist_percorrida = (int) Math.sqrt(Math.pow(cenas_x, 2) + Math.pow(cenas_y, 2));
 						combustivel_atual -= dist_percorrida * consumo;
@@ -218,6 +221,21 @@ public class AgenteParticipativo extends Agent implements Serializable{
 					}
 				}
 			}
+		}
+	}
+	
+	protected void EnviaMovimento() {
+		AID agente_interface = new AID();
+		agente_interface.setLocalName("AgenteInterface");
+		ACLMessage msgi = new ACLMessage(ACLMessage.INFORM);
+		Agente a = new Agente(getAID(), pos.getX(), pos.getY());
+		try {
+			msgi.setContentObject(a);
+			msgi.addReceiver(agente_interface);
+			send(msgi);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -263,13 +281,13 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		}
 		protected void onTick() {
 			if (disponivel == false) {
-				AID i = new AID();
-				i.setLocalName("AgenteCentral");
+				AID agente_central = new AID();
+				agente_central.setLocalName("AgenteCentral");
 				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 				Agente a = new Agente(combustivel_atual, agua_atual, pos.getX(), pos.getY());
 				try {
 					msg.setContentObject(a);
-					msg.addReceiver(i);
+					msg.addReceiver(agente_central);
 					send(msg);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

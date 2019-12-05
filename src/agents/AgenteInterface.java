@@ -21,19 +21,25 @@ public class AgenteInterface extends Agent{
 		public void action() {
 			ACLMessage msg = receive();
 			try {
-				if(msg != null && msg.getPerformative() == ACLMessage.INFORM) {
-					Incendio i = (Incendio) msg.getContentObject();
-					incendios.add(i);
+				if (msg !=null) {
+					if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Agente) {
+						Agente a = (Agente) msg.getContentObject();
+						int pos_x = a.getPos_x();
+						int pos_y = a.getPos_y();
+						System.out.println("Agente interface a receber "+pos_x+" "+pos_y+" do "+a.getAgente().getLocalName());
+					} else if(msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
+						Incendio i = (Incendio) msg.getContentObject();
+						incendios.add(i);
+					}
+					else if(msg.getPerformative() == ACLMessage.CONFIRM) {
+						System.out.println(msg.getContent());
+						String[] coordsIncendio = msg.getContent().split(";");
+						int incendio=Integer.parseInt(coordsIncendio[0]);
+						long duracao=Long.parseLong(coordsIncendio[1]);
+						System.out.println("RECEBI QUE O INCENDIO TERMINOU" + incendio +"durou" + duracao);
+						incendios.get(incendio).setTime(duracao);
+					} else block();
 				}
-				else if(msg != null && msg.getPerformative() == ACLMessage.CONFIRM) {
-					System.out.println(msg.getContent());
-					String[] coordsAviao = msg.getContent().split(";");
-					int incendio=Integer.parseInt(coordsAviao[0]);
-					long duracao=Long.parseLong(coordsAviao[1]);
-					System.out.println("RECEBI QUE O INCENDIO TERMINOU" + incendio +"durou" + duracao);
-					incendios.get(incendio).setTime(duracao);
-				}else
-					block();
 			}catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

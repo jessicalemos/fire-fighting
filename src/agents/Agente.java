@@ -44,6 +44,12 @@ public class Agente implements Serializable {
 		this.pos = new Posicao(pos_x,pos_y);
 	}
 	
+	public Agente(AID agente, int pos_x, int pos_y) {
+		super();
+		this.agente = agente;
+		this.pos = new Posicao(pos_x,pos_y);
+	}
+	
 	public AID getAgente() {
 		return agente;
 	}

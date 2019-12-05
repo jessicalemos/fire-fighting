@@ -25,3 +25,9 @@
 /AgenteCentral$EnviaCombate.class
 /Mapa$1.class
 /Mapa.class
+/AgenteInterface$ReceberMensagens.class
+/AgenteInterface.class
+/AgenteParticipativo$EnviaMovimento.class
+/EnviaInfo.class
+/EnviaPosicao.class
+/RecebePosição.class
