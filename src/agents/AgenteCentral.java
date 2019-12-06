@@ -105,6 +105,12 @@ public class AgenteCentral extends Agent {
 						int yinc = a.getPos().getY();
 						Agente m = DisponivelMaisRapido(xinc,yinc,a.getGravidade());
 						if (m != null) {
+							ACLMessage msgi = new ACLMessage(ACLMessage.REQUEST);
+							AID agente_interface = new AID();
+							agente_interface.setLocalName("AgenteInterface");
+							msgi.addReceiver(agente_interface);
+							msgi.setContent(""+i+";"+m.getTipo());
+							send(msgi);
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 							msg.setContent(i + ";" + xinc + ";" + yinc);
 							msg.addReceiver(m.getAgente());
