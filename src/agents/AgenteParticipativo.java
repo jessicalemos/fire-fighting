@@ -102,7 +102,6 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		int x_rand = min_x + randomizer.nextInt(((max_x) - min_x) + 1);
 		int y_rand = min_y + randomizer.nextInt(((max_y) - min_y) + 1);
 		pos = new Posicao(x_rand,y_rand);
-		EnviaMovimento();
 		local_agua = val.get_agua();
 		local_combustivel = val.get_combustivel();
 		disponivel = true;
@@ -162,7 +161,13 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			super(a, period);
 		}
 		protected void onTick() {
-			if(disponivel==false) {
+			int agente_tipo = -1;
+			if(disponivel==true) {
+				if(myAgent instanceof Drone) agente_tipo = 1;
+				else if (myAgent instanceof Aeronave) agente_tipo = 2;
+				else agente_tipo = 3;
+			}
+			else {
 				if (incendio_extinto == true && abastecer_agua == false && abastecer_combustivel == false) {
 					System.out.println("VOU FICAR DISPONIVEL");
 					disponivel = true;
@@ -204,7 +209,8 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						pos.setY(dest.getY());
 						agua_atual--;
 						incendio_extinto = true;
-						EnviaMovimento();
+						
+						EnviaMovimento(agente_tipo);
 						InformIncendioExtinto();
 						System.out.println("Em abastacimento "+ getAID().getLocalName() + " agua "+agua_atual);
 						VerificaAbastecimento();
@@ -213,7 +219,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						int cenas_y = (int) (velocidade * (dest.getY() - pos.getY()) / dist) + 1;
 						pos.setX(pos.getX() + cenas_x);
 						pos.setY(pos.getY() + cenas_y);
-						EnviaMovimento();
+						EnviaMovimento(agente_tipo);
 						System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());
 						int dist_percorrida = (int) Math.sqrt(Math.pow(cenas_x, 2) + Math.pow(cenas_y, 2));
 						combustivel_atual -= dist_percorrida * consumo;
@@ -224,11 +230,12 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		}
 	}
 	
-	protected void EnviaMovimento() {
+	protected void EnviaMovimento(int agente_tipo) {
 		AID agente_interface = new AID();
 		agente_interface.setLocalName("AgenteInterface");
 		ACLMessage msgi = new ACLMessage(ACLMessage.INFORM);
-		Agente a = new Agente(getAID(), pos.getX(), pos.getY());
+		int tipo;
+		Agente a = new Agente(getAID(), pos.getX(), pos.getY(),agente_tipo);
 		try {
 			msgi.setContentObject(a);
 			msgi.addReceiver(agente_interface);
@@ -268,6 +275,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 				msg.setContentObject(a);
 				msg.addReceiver(i);
 				send(msg);
+				EnviaMovimento(tipo);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
