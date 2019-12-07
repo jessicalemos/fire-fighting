@@ -54,14 +54,15 @@ public class MainContainer {
 	public static void main(String[] args) {
 		MainContainer a = new MainContainer();
 		a.initMainContainerInPlatform("localhost", "9999", "MainContainer");
+		a.startAgentInPlatform("AgenteInterface", "agents.AgenteInterface");
 		a.startAgentInPlatform("AgenteCentral", "agents.AgenteCentral");
 		a.startAgentInPlatform("AgenteSecundario", "agents.AgenteSecundario");
 		//a.startAgentInPlatform("AgenteParticipativo", "agents.Drone");
 		for(int i = 0; i<10; i++)
 			a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Drone");
-		//for(int i = 10; i<12; i++)
-			//a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Aeronave");
-		//for(int i = 12; i<17; i++)
-		//a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Camiao");
+		for(int i = 10; i<12; i++)
+			a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Aeronave");
+		for(int i = 12; i<17; i++)
+			a.startAgentInPlatform("AgenteParticipativo " + i, "agents.Camiao");
 	}
 }

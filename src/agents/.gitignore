@@ -25,3 +25,17 @@
 /AgenteCentral$EnviaCombate.class
 /Mapa$1.class
 /Mapa.class
+/AgenteInterface$ReceberMensagens.class
+/AgenteInterface.class
+/AgenteParticipativo$EnviaMovimento.class
+/EnviaInfo.class
+/EnviaPosicao.class
+/RecebePosição.class
+/AgenteInterface$1.class
+/AgenteInterface$Work.class
+/AgenteInterface$SimpleBarPanel.class
+/AgenteInterface$BarChartExample.class
+/AgenteInterface$BarChartExample$ReceberMensagens.class
+/AgenteInterface$BarChartExample$SimpleBarPanel.class
+/AgenteInterface$2.class
+/AgenteInterface$JavaJFreeChartPieChart3D.class
