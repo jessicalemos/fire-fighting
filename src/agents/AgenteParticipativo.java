@@ -192,6 +192,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						System.out.println("Cheguei ao combustível " + getAID().getLocalName());
 						pos.setX(dest.getX());
 						pos.setY(dest.getY());
+						EnviaMovimento(agente_tipo);
 						combustivel_atual = combustivel_max;
 						abastecer_combustivel = false;
 						System.out.println("Abasteci " + getAID().getLocalName() + " tenho combustivel: " + combustivel_atual);
@@ -200,6 +201,7 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						System.out.println("Cheguei à água " + getAID());
 						pos.setX(dest.getX());
 						pos.setY(dest.getY());
+						EnviaMovimento(agente_tipo);
 						abastecer_agua = false;
 						agua_atual = agua_max;
 						System.out.println("Abasteci " + getAID().getLocalName() + " tenho agua: " + agua_atual);
@@ -209,7 +211,6 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						pos.setY(dest.getY());
 						agua_atual--;
 						incendio_extinto = true;
-						
 						EnviaMovimento(agente_tipo);
 						InformIncendioExtinto();
 						System.out.println("Em abastacimento "+ getAID().getLocalName() + " agua "+agua_atual);

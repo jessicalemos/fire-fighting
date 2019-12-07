@@ -5,13 +5,11 @@ import java.util.List;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.UnreadableException;
-import javax.swing.JScrollPane;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.util.Map;
 import jade.core.AID;
 import java.util.stream.Collectors;
@@ -21,19 +19,18 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+
 import org.jfree.chart.labels.*;
 import org.jfree.chart.plot.*;
 import java.text.DecimalFormat;
 
 
 public class AgenteInterface extends Agent{
-	private static JLabel[][] grid = new JLabel[100][100];
 	private List<Incendio> incendios;
 	protected List<Posicao> local_agua;
 	protected List<Posicao> local_combustivel;
-	protected Map<AID,Posicao> agentes_mapa;
-	private static Object[][] mapa;
-	private static int tamanho_mapa = 100;
+	protected Map<AID,Object[]> agentes_mapa;
+	private static int tamanho_mapa;
 	private final DefaultCategoryDataset model = new DefaultCategoryDataset();
 	private final DefaultCategoryDataset m = new DefaultCategoryDataset();
 	private DefaultPieDataset dataset = new DefaultPieDataset();
@@ -43,9 +40,11 @@ public class AgenteInterface extends Agent{
 	private long tempo_maximo;
 	private long tempo_medio;
 	private JFrame f;
+	private Work work;
 	
 	protected void setup() {
 		super.setup();
+		tamanho_mapa = 500;
 		this.total_combate = 0;
 		this.tempo_maximo = 0;
 		this.tempo_minimo = 1000000;
@@ -55,35 +54,16 @@ public class AgenteInterface extends Agent{
 		local_agua = val.get_agua();
 		local_combustivel = val.get_combustivel();
 		this.incendios = new ArrayList<Incendio>();
-		this.agentes_mapa = new HashMap<AID, Posicao>();
-		mapa = new Object[600][600];
+		this.agentes_mapa = new HashMap<AID, Object[]>();
 		agentes = new Object[10];
-		AdicionaMapa();
 		JFrame frame = new JFrame(getClass().getSimpleName());
-		frame.setSize(600,600);
-		JPanel panel = new JPanel();
-		panel.setBounds(0, 0, 500, 500);
-		frame.getContentPane().setLayout(null);
-		frame.getContentPane().add(panel);
-		panel.setLayout(new GridLayout(100, 100));
-		/*JScrollPane scrollPane = new JScrollPane();
-		panel.add(scrollPane); 
-		panel.setPreferredSize(new Dimension(100,100));*/
-	    for (int i = 0; i < tamanho_mapa; i++){
-	        for (int j = 0; j < tamanho_mapa; j++){
-	            grid[j][i] = new JLabel();
-	            grid[j][i].setBorder(new LineBorder(Color.BLACK));
-	            grid[j][i].setHorizontalAlignment(SwingConstants.CENTER);
-	            grid[j][i].setVerticalAlignment(SwingConstants.CENTER);
-	            grid[j][i].setOpaque(true);
-	            fillCell(mapa[j][i],grid[j][i]);
-	            panel.add(grid[j][i]);
-	        }
-	    }
-	    frame.setBounds(0, 0, 500, 500);
+        work = new Work();
+        JScrollPane scroll = new JScrollPane(work);
+        frame.add(scroll);
+        work.setPreferredSize(new Dimension(500*10,500*10));
+        frame.pack();
 	    frame.setVisible(true);
-		f = new JFrame("Estatísticas"); 
-		frame.setLayout(new FlowLayout());
+		f = new JFrame("Estatísticas");
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 		JFreeChart chart = ChartFactory.createBarChart("Incendios", "", "Nº", model, PlotOrientation.VERTICAL, false, false, false); 
 		ChartPanel barPanel = new ChartPanel(chart);
@@ -105,53 +85,51 @@ public class AgenteInterface extends Agent{
 		f.getContentPane().add(barPanel2,BorderLayout.AFTER_LAST_LINE);
 		f.pack();
 		f.setLocationRelativeTo(null); 
-		f.setVisible(true); 
+		f.setVisible(true);
 		this.addBehaviour(new ReceberMensagens());
 	}
-	    
 	
-	
-	public void AdicionaMapa() {
-		for (int i = 0; i < 500; i++){
-	        for (int j = 0; j < 500; j++){
-	        	mapa[i][j] = "";
+	public class Work extends JPanel{
+	   public void paintComponent(Graphics g){
+	    	int x, y;
+	    	super.paintComponent(g);
+	        for (int row = 0; row < tamanho_mapa; row++) { 
+	            for (int col = 0; col < tamanho_mapa; col++) { 
+	                x = row * 10;
+	                y = col * 10;
+                	g.drawRect(x, y, 10, 10);
+	            } 
 	        }
-		}
-		for(Posicao pa : local_agua) {
-			mapa[pa.getX()][pa.getY()] = "AA";
-		}
-		for(Posicao pc : local_combustivel) {
-			mapa[pc.getX()][pc.getY()] = "AC";
-		}
+	        for(Posicao pa : local_agua) {
+				g.setColor(Color.BLUE);
+				g.fillRect(pa.getX() * 10, pa.getY() * 10, 10, 10);
+			}
+			for(Posicao pc : local_combustivel) {
+				g.setColor(Color.ORANGE);
+				g.fillRect(pc.getX() * 10, pc.getY() * 10, 10, 10);
+			}
+			for(Incendio i : incendios) {
+				if(i.getExtinto()!=2) {
+					g.setColor(Color.RED);
+					g.fillRect(i.getPos().getX() * 10, i.getPos().getY() * 10, 10, 10);
+				} else {
+					g.setColor(Color.BLACK);
+					g.drawRect(i.getPos().getX() * 10, i.getPos().getY() * 10, 10, 10);
+				}
+			}
+			for(Object[] o : agentes_mapa.values()) {
+				Posicao pos_atual = (Posicao) o[1];
+				Posicao pos_ant = (Posicao) o[0];
+				g.setColor(Color.GREEN);
+				g.fillRect(pos_atual.getX() * 10, pos_atual.getY() * 10, 10, 10);
+				if(pos_ant != null) {
+					g.setColor(Color.BLACK);
+					g.drawRect(pos_ant.getX() * 10, pos_ant.getY() * 10, 10, 10);
+				}
+			}
+	    }
 	}
-	
-	private static void fillCell(Object cell, JLabel gridCell) {
-		if (cell.equals("AA")) {
-			gridCell.setBackground(Color.green);
-		}
-		else if (cell.equals("AC")) {
-			gridCell.setBackground(Color.orange);
-		} 
-		else if (cell.equals("I")) {
-			gridCell.setBackground(Color.red);
-		}
-		else if (cell.equals("D") || cell.equals("A") || cell.equals("C")) {
-			gridCell.setBackground(Color.blue);
-		} 
-		else {
-			gridCell.setBackground(null);
-		}
-	}
-	
-	public static void fillGrid() {
-		for (int i = 0; i < tamanho_mapa ; i++){
-		    for (int j = 0; j < tamanho_mapa; j++){
-		        grid[j][i].setOpaque(true);
-		        fillCell(mapa[j][i], grid[j][i]);
-		    }
-		}
-	}
-	
+
 	private void createSampleDataset() {
 	    if (total_combate!=0) {
 	    	int drones = (int)agentes[1];
@@ -209,30 +187,32 @@ public class AgenteInterface extends Agent{
 						Agente a = (Agente) msg.getContentObject();
 						int pos_x = a.getPos_x();
 						int pos_y = a.getPos_y();
-						Posicao pos_atual = new Posicao(pos_x,pos_y);
-						Posicao pos_anterior = agentes_mapa.get(a.getAgente());
-						if(pos_anterior!= null) {
-							mapa[pos_anterior.getX()][pos_anterior.getY()] = "";
+						Object[] pos;
+						if (!agentes_mapa.containsKey(a.getAgente())) {
+							pos = new Object[3];
+							pos[0] = null;
+							pos[1] = new Posicao(pos_x,pos_y);
+						} else {
+							pos = agentes_mapa.get(a.getAgente());
+							pos[0] = pos[1];
+							pos[1] = new Posicao(pos_x,pos_y);
 						}
-						agentes_mapa.put(a.getAgente(), pos_atual);
+
+						agentes_mapa.put(a.getAgente(),pos);
 						if (a.getTipo() == 1) {
-							mapa[pos_x][pos_y] = "D";
 							agentes[1] = 0;
 						}
 						else if (a.getTipo() == 2) {
-							mapa[pos_x][pos_y] = "A";
 							agentes[2] = 0;
 						}
 						else if (a.getTipo() == 3) {
-							mapa[pos_x][pos_y] = "C";
 							agentes[3] = 0;
 						}
 						System.out.println("Agente INTERFACE a receber "+pos_x+" "+pos_y+" do "+a.getAgente().getLocalName());
 					} else if(msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
 						Incendio i = (Incendio) msg.getContentObject();
 						incendios.add(i);
-						Posicao incendio = i.getPos();
-						mapa[incendio.getX()][incendio.getY()] = "I";
+						work.updateUI();
 						Update();
 					}
 					else if(msg.getPerformative() == ACLMessage.CONFIRM) {
@@ -242,9 +222,6 @@ public class AgenteInterface extends Agent{
 						System.out.println("RECEBI QUE O INCENDIO TERMINOU" + incendio +"durou" + duracao);
 						incendios.get(incendio).setTime(duracao);
 						incendios.get(incendio).setExtinto(2);
-						Incendio i = incendios.get(incendio);
-						Posicao p = i.getPos();
-						mapa[p.getX()][p.getY()] = "";
 						Update();
 						TimeUpdate(duracao);
 					} else if(msg.getPerformative() == ACLMessage.REQUEST) {
@@ -257,7 +234,6 @@ public class AgenteInterface extends Agent{
 						createSampleDataset();
 					} 
 					else block();
-					fillGrid();
 				}
 			}catch (Exception e) {
 				// TODO Auto-generated catch block
