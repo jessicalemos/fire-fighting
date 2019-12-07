@@ -79,10 +79,12 @@ public class AgenteInterface extends Agent{
             
         JFreeChart chart3 = ChartFactory.createBarChart("Tempo Medio", "", "Tempo", m, PlotOrientation.VERTICAL, false, false, false); 
 		ChartPanel barPanel2 = new ChartPanel(chart3);
-		
+		barPanel2.setPreferredSize(new Dimension(600,400));
+		chartPanel.setPreferredSize(new Dimension(600,400));
+		barPanel.setPreferredSize(new Dimension(600,400));
 		f.getContentPane().add(barPanel,BorderLayout.WEST); 
 		f.getContentPane().add(chartPanel,BorderLayout.EAST);
-		f.getContentPane().add(barPanel2,BorderLayout.AFTER_LAST_LINE);
+		f.getContentPane().add(barPanel2,BorderLayout.CENTER);
 		f.pack();
 		f.setLocationRelativeTo(null); 
 		f.setVisible(true);
