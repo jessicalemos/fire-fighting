@@ -35,14 +35,21 @@ public class AgenteInterface extends Agent{
 	private static Object[][] mapa;
 	private static int tamanho_mapa = 100;
 	private final DefaultCategoryDataset model = new DefaultCategoryDataset();
+	private final DefaultCategoryDataset m = new DefaultCategoryDataset();
 	private DefaultPieDataset dataset = new DefaultPieDataset();
 	private static Object[] agentes;
 	private int total_combate;
+	private long tempo_minimo;
+	private long tempo_maximo;
+	private long tempo_medio;
 	private JFrame f;
 	
 	protected void setup() {
 		super.setup();
 		this.total_combate = 0;
+		this.tempo_maximo = 0;
+		this.tempo_minimo = 1000000;
+		this.tempo_medio = 0;
 		Object[] args = getArguments();
 		Mapa val = (Mapa) args[0];
 		local_agua = val.get_agua();
@@ -90,9 +97,13 @@ public class AgenteInterface extends Agent{
         plot1.setLabelGenerator(labelGenerator);
         ChartPanel chartPanel = new ChartPanel(chart2);
             
+        JFreeChart chart3 = ChartFactory.createBarChart("Tempo Medio", "", "Tempo", m, PlotOrientation.VERTICAL, false, false, false); 
+		ChartPanel barPanel2 = new ChartPanel(chart3);
+		
 		f.getContentPane().add(barPanel,BorderLayout.WEST); 
 		f.getContentPane().add(chartPanel,BorderLayout.EAST);
-		f.pack(); 
+		f.getContentPane().add(barPanel2,BorderLayout.AFTER_LAST_LINE);
+		f.pack();
 		f.setLocationRelativeTo(null); 
 		f.setVisible(true); 
 		this.addBehaviour(new ReceberMensagens());
@@ -171,6 +182,23 @@ public class AgenteInterface extends Agent{
 		model.setValue(incendios_combate.size(), ROW_KEY, "Em combate"); 
 		model.setValue(incendios_extintos.size(), ROW_KEY, "Extintos"); 
 	}
+	
+	public void TimeUpdate(long duracao) {
+		String ROW_KEY = "Values"; 
+		if(duracao<tempo_minimo) tempo_minimo = duracao;
+		if (duracao>tempo_maximo) tempo_maximo = duracao;
+		List<Incendio> incendios_extintos = incendios
+				  .stream()
+				  .filter(c -> c.getExtinto()==2)
+				  .collect(Collectors.toList());
+		int size = incendios_extintos.size() - 1;
+		long total =  (tempo_medio * size) + duracao;
+		size++;
+		tempo_medio = total/size;
+		m.setValue(tempo_minimo, ROW_KEY, "Mínimo"); 
+		m.setValue(tempo_medio, ROW_KEY, "Médio"); 
+		m.setValue(tempo_maximo, ROW_KEY, "Máximo"); 
+	}
 
 	private class ReceberMensagens extends CyclicBehaviour {
 		public void action() {
@@ -218,6 +246,7 @@ public class AgenteInterface extends Agent{
 						Posicao p = i.getPos();
 						mapa[p.getX()][p.getY()] = "";
 						Update();
+						TimeUpdate(duracao);
 					} else if(msg.getPerformative() == ACLMessage.REQUEST) {
 						String[] incendio_info = msg.getContent().split(";");;
 						int incendio = Integer.parseInt(incendio_info[0]);
