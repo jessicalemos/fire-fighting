@@ -62,7 +62,7 @@ public class AgenteCentral extends Agent {
 								engine.executeCommand("(assert (combate (velocidade "+c.getVelocidade()+")(consumo "+c.getConsumo()+")(tipo "+c.getTipo()+")(disponivel "+c.isDisponibilidade()+")(x "+c.getPos_x()+")(y "+c.getPos_y()+")(id "+local[1]+")(agua "+c.getAgua()+")(combustivel "+c.getCombustivel()+")))");
 								engine.run();
 							}
-							System.out.println("Guardei informacao do "+sender.getLocalName()+ " " + c.isDisponibilidade());				
+							System.out.println("Guardei informacao do "+sender.getLocalName());				
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
 						Incendio c = (Incendio) msg.getContentObject();
