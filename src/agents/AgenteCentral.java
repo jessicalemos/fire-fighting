@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import java.util.ArrayList;
 import jade.content.ContentElement;
 import jade.content.lang.Codec.CodecException;
@@ -22,7 +23,6 @@ import jade.lang.acl.UnreadableException;
 import jess.*;
 
 public class AgenteCentral extends Agent {
-	private HashMap<AID,Agente> agentesParticipativos;
 	private List<Incendio> incendios;
 	private int drones;
 	private int aeronaves;
@@ -33,7 +33,6 @@ public class AgenteCentral extends Agent {
 		super.setup();
 		drones=10;aeronaves=2;camioes=5;
 		this.incendios = new ArrayList<Incendio>();
-		this.agentesParticipativos = new HashMap<AID,Agente>();
 		this.addBehaviour(new RecebePosicao());
 		this.engine= new Rete();
 		try {
@@ -53,25 +52,17 @@ public class AgenteCentral extends Agent {
 						Agente c = (Agente) msg.getContentObject();
 						AID sender = msg.getSender();
 						//String local[]=c.getAgente().getLocalName().split(" ");
-						if(agentesParticipativos.containsKey(sender)) {
-							Agente x = agentesParticipativos.get(sender);
-							x.setAgua(c.getAgua());
-							x.setCombustivel(c.getCombustivel());
-							x.setPos(c.getPos());
-							agentesParticipativos.put(sender,x);
 							String local[]=sender.getLocalName().split(" ");
-							engine.executeCommand("(assert (agente (x "+c.getPos_x()+")(y "+c.getPos_y()+")(id "+local[1]+")(agua "+c.getAgua()+")(combustivel "+c.getCombustivel()+")))");
-							engine.run();
-							System.out.println("Guardei informacao do "+sender.getLocalName()+ " " + x.isDisponibilidade());
-						}
-						else {
-							agentesParticipativos.put(sender, c);
-							String local[]=sender.getLocalName().split(" ");
-							System.out.println("Guardei informacao do " + sender.getLocalName());
-							engine.executeCommand("(assert (combate (velocidade "+c.getVelocidade()+")(consumo "+c.getConsumo()+")(tipo "+c.getTipo()+")(disponivel "+c.isDisponibilidade()+")(x "+c.getPos_x()+")(y "+c.getPos_y()+")(id "+local[1]+")(agua "+c.getAgua()+")(combustivel "+c.getCombustivel()+")))");
-							engine.executeCommand("(facts)");
-							engine.run();
-						}
+							if (c.isDisponibilidade()==null)
+							{
+								engine.executeCommand("(assert (agente (x "+c.getPos_x()+")(y "+c.getPos_y()+")(id "+local[1]+")(agua "+c.getAgua()+")(combustivel "+c.getCombustivel()+")))");
+								engine.run();
+							}
+							else {
+								engine.executeCommand("(assert (combate (velocidade "+c.getVelocidade()+")(consumo "+c.getConsumo()+")(tipo "+c.getTipo()+")(disponivel "+c.isDisponibilidade()+")(x "+c.getPos_x()+")(y "+c.getPos_y()+")(id "+local[1]+")(agua "+c.getAgua()+")(combustivel "+c.getCombustivel()+")))");
+								engine.run();
+							}
+							System.out.println("Guardei informacao do "+sender.getLocalName()+ " " + c.isDisponibilidade());				
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
 						Incendio c = (Incendio) msg.getContentObject();
@@ -92,19 +83,14 @@ public class AgenteCentral extends Agent {
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
 						String a= msg.getContent();
-						AID sender= msg.getSender();
-						Agente x = agentesParticipativos.get(sender);
 						String[] lista = a.split(" ");
+						AID l=msg.getSender();
 						if (lista[0].equals("true")) {
-							x.setDisponibilidade(true);
 							incrementaContadores(lista[1].trim());
 						}
-						else x.setDisponibilidade(false);
-						agentesParticipativos.put(sender,x);
-						System.out.println("Disponivel "+ sender.getLocalName()+" "+x.isDisponibilidade()+" "+a.trim());
-						AID l=msg.getSender();
+						System.out.println("Disponivel "+ l.getLocalName()+" "+a.trim());
 						String numero[]=l.getLocalName().split(" ");
-						engine.executeCommand("(assert (disponivel (valor "+x.isDisponibilidade()+")(id "+numero[1]+")))");
+						engine.executeCommand("(assert (disponivel (valor "+true+")(id "+numero[1]+")))");
 						engine.run();
 						myAgent.addBehaviour(new EnviaCombate());
 					}
@@ -153,7 +139,6 @@ public class AgenteCentral extends Agent {
 							System.out.println("Enviei combate " + i + " " + xinc + " " + yinc + " " +  m.getAgente().getLocalName());
 							m.setDisponibilidade(false);
 							a.setExtinto(1);
-							agentesParticipativos.put(m.getAgente(), m);
 							decrementaContador(m);
 							String numero[]=m.getAgente().getLocalName().split(" ");
 							try {
