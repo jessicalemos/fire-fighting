@@ -1,38 +1,23 @@
 package agents;
 import jade.core.Agent;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import Apoio.*;
 
 import java.util.ArrayList;
-import jade.content.ContentElement;
-import jade.content.lang.Codec.CodecException;
-import jade.content.onto.OntologyException;
-import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.domain.DFService;
-import jade.domain.FIPAException;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jess.*;
 
 public class AgenteCentral extends Agent {
 	private List<Incendio> incendios;
-	private int drones;
-	private int aeronaves;
-	private int camioes;
 	private Rete engine;
 	
 	protected void setup() {
 		super.setup();
-		drones=10;aeronaves=2;camioes=5;
 		this.incendios = new ArrayList<Incendio>();
 		this.addBehaviour(new RecebePosicao());
 		this.engine= new Rete();
@@ -52,7 +37,6 @@ public class AgenteCentral extends Agent {
 					if(msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Agente) {
 						Agente c = (Agente) msg.getContentObject();
 						AID sender = msg.getSender();
-						//String local[]=c.getAgente().getLocalName().split(" ");
 							String local[]=sender.getLocalName().split(" ");
 							if (c.isDisponibilidade()==null)
 							{
@@ -84,11 +68,7 @@ public class AgenteCentral extends Agent {
 					}
 					else if (msg.getPerformative() == ACLMessage.INFORM_IF) {
 						String a= msg.getContent();
-						String[] lista = a.split(" ");
 						AID l=msg.getSender();
-						if (lista[0].equals("true")) {
-							incrementaContadores(lista[1].trim());
-						}
 						System.out.println("Disponivel "+ l.getLocalName()+" "+a.trim());
 						String numero[]=l.getLocalName().split(" ");
 						engine.executeCommand("(assert (disponivel (valor "+true+")(id "+numero[1]+")))");
@@ -140,7 +120,6 @@ public class AgenteCentral extends Agent {
 							System.out.println("Enviei combate " + i + " " + xinc + " " + yinc + " " +  m.getAgente().getLocalName());
 							m.setDisponibilidade(false);
 							a.setExtinto(1);
-							decrementaContador(m);
 							String numero[]=m.getAgente().getLocalName().split(" ");
 							try {
 								engine.executeCommand("(assert (disponivel (valor "+m.isDisponibilidade()+")(id "+numero[1]+")))");
@@ -191,21 +170,7 @@ public class AgenteCentral extends Agent {
 		boolean fim = false;
 		double dist = Math.sqrt(Math.pow((xagent - x), 2) + Math.pow((yagent - y), 2));
 		if (dist * agent.getConsumo() < agent.getCombustivel()) fim = true;
-		if (fim == false) {
-			//System.out.println("Não consegue!");
-		}
 		return fim;
-	}
-	private void decrementaContador(Agente x){
-		if (x.getTipo() == 1) drones--;
-		else if (x.getTipo() == 3) camioes--;
-		else if (x.getTipo() == 2) aeronaves--;
-	}
-	
-	private void incrementaContadores(String a){
-		if (a.equals("Drone")) drones++;
-		else if (a.equals("Camiao")) camioes++;
-		else if (a.equals("Aeronave")) aeronaves++;
 	}
 	
 	private void informaExtinto(long duracao, int idIncendio){

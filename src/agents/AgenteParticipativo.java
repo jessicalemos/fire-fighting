@@ -14,7 +14,6 @@ import jade.lang.acl.ACLMessage;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.HashMap;
 import Apoio.*;
 
 public class AgenteParticipativo extends Agent implements Serializable{
@@ -147,13 +146,11 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			Posicao local_combustivel = AbastecimentoMaisProximo(1);
 			combustivel_pos = new Posicao(local_combustivel.getX(),local_combustivel.getY());
 			abastecer_combustivel = true;
-			System.out.println("No abastecimento "+combustivel_pos.getX() + " " + combustivel_pos.getY());
 		}
 		if (agua_atual == 0) {
 			Posicao local_agua = AbastecimentoMaisProximo(0);
 			agua_pos = new Posicao(local_agua.getX(),local_agua.getY());
 			abastecer_agua = true;
-			System.out.println("Na água "+agua_pos.getX() + " " + agua_pos.getY());
 		}
 	}
 
@@ -170,27 +167,23 @@ public class AgenteParticipativo extends Agent implements Serializable{
 			}
 			else {
 				if (incendio_extinto == true && abastecer_agua == false && abastecer_combustivel == false) {
-					System.out.println("VOU FICAR DISPONIVEL");
 					disponivel = true;
 					EnviaDisponivel();
 				}
 				else {
 					double dist = Math.sqrt(Math.pow((dest.getX()-pos.getX()),2) + Math.pow((dest.getY()-pos.getY()),2));
 					if (abastecer_combustivel == true) {
-						System.out.println("Vou para o combustível " + getAID().getLocalName());
 						dest.setX(combustivel_pos.getX());
 						dest.setY(combustivel_pos.getY());
 						dist = Math.sqrt(Math.pow((dest.getX()-pos.getX()),2) + Math.pow((dest.getY()-pos.getY()),2));
 					}
 					else if (abastecer_agua == true) {
-						System.out.println("Vou para a água " + getAID().getLocalName());
 						dest.setX(agua_pos.getX());
 						dest.setY(agua_pos.getY());
 						dist = Math.sqrt(Math.pow((dest.getX()-pos.getX()),2) + Math.pow((dest.getY()-dest.getY()),2));
 					}
 					int destino_dist = (int) dist;
 					if (abastecer_combustivel == true && destino_dist <= velocidade) {
-						System.out.println("Cheguei ao combustível " + getAID().getLocalName());
 						pos.setX(dest.getX());
 						pos.setY(dest.getY());
 						EnviaMovimento(agente_tipo);
@@ -199,7 +192,6 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						System.out.println("Abasteci " + getAID().getLocalName() + " tenho combustivel: " + combustivel_atual);
 					}
 					else if (abastecer_agua == true && abastecer_combustivel == false && destino_dist <= velocidade) {
-						System.out.println("Cheguei à água " + getAID());
 						pos.setX(dest.getX());
 						pos.setY(dest.getY());
 						EnviaMovimento(agente_tipo);
@@ -217,13 +209,13 @@ public class AgenteParticipativo extends Agent implements Serializable{
 						System.out.println("Em abastacimento "+ getAID().getLocalName() + " agua "+agua_atual);
 						VerificaAbastecimento();
 					} else {
-						int cenas_x = (int) (velocidade * (dest.getX() - pos.getX()) / dist) + 1;
-						int cenas_y = (int) (velocidade * (dest.getY() - pos.getY()) / dist) + 1;
-						pos.setX(pos.getX() + cenas_x);
-						pos.setY(pos.getY() + cenas_y);
+						int next_x = (int) (velocidade * (dest.getX() - pos.getX()) / dist) + 1;
+						int next_y = (int) (velocidade * (dest.getY() - pos.getY()) / dist) + 1;
+						pos.setX(pos.getX() + next_x);
+						pos.setY(pos.getY() + next_y);
 						EnviaMovimento(agente_tipo);
 						System.out.println("Em movimento agente: " + getAID().getLocalName() + " pos_x " +pos.getX() + " pos_y " + pos.getY());
-						int dist_percorrida = (int) Math.sqrt(Math.pow(cenas_x, 2) + Math.pow(cenas_y, 2));
+						int dist_percorrida = (int) Math.sqrt(Math.pow(next_x, 2) + Math.pow(next_y, 2));
 						combustivel_atual -= dist_percorrida * consumo;
 						System.out.println("Combustivel atual: " + combustivel_atual+" "+dist_percorrida);
 					}
@@ -314,7 +306,6 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		msg.addReceiver(central);
 		msg.setContent(""+id_incendio);
 		send(msg);
-		System.out.println("Confirmo incendio " + id_incendio + " extinto");
 	}
 	
 	
@@ -326,6 +317,5 @@ public class AgenteParticipativo extends Agent implements Serializable{
 		String s1 = this.getClass().toString();
 		msg.setContent(""+disponivel+" "+(s1.substring(s1.indexOf(".")+1)));
 		send(msg);
-		System.out.println("Enviei disponível!");
 	}
 }

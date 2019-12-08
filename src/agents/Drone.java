@@ -1,5 +1,5 @@
 package agents;
-import Apoio.*;
+
 import java.io.Serializable;
 
 public class Drone extends AgenteParticipativo implements Serializable{

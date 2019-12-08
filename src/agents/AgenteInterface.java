@@ -136,8 +136,7 @@ public class AgenteInterface extends Agent{
 	    	int drones = (int)agentes[1];
 	    	int camioes = (int)agentes[3];
 	    	int aeronaves = (int)agentes[2];
-	    	System.out.println(drones + " total " + total_combate + " PERCENTAGEM " + (double)drones/total_combate * 100);
-		    dataset.setValue("Drones", new Double((double)drones/total_combate * 100));
+	    	dataset.setValue("Drones", new Double((double)drones/total_combate * 100));
 		    dataset.setValue("Camiões", new Double((double)camioes/total_combate * 100));
 		    dataset.setValue("Aeronaves", new Double((double)aeronaves/total_combate * 100));
 	    }
@@ -209,7 +208,7 @@ public class AgenteInterface extends Agent{
 						else if (a.getTipo() == 3) {
 							agentes[3] = 0;
 						}
-						System.out.println("Agente INTERFACE a receber "+pos_x+" "+pos_y+" do "+a.getAgente().getLocalName());
+						work.updateUI();
 					} else if(msg.getPerformative() == ACLMessage.INFORM && msg.getContentObject() instanceof Incendio) {
 						Incendio i = (Incendio) msg.getContentObject();
 						incendios.add(i);
@@ -220,7 +219,6 @@ public class AgenteInterface extends Agent{
 						String[] coordsIncendio = msg.getContent().split(";");
 						int incendio=Integer.parseInt(coordsIncendio[0]);
 						long duracao=Long.parseLong(coordsIncendio[1]);
-						System.out.println("RECEBI QUE O INCENDIO TERMINOU" + incendio +"durou" + duracao);
 						incendios.get(incendio).setTime(duracao);
 						incendios.get(incendio).setExtinto(2);
 						Update();
