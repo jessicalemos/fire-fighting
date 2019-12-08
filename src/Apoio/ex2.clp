@@ -1,9 +1,3 @@
-(deftemplate incendio
-	(slot gravidade)
-	(slot x)
-	(slot y))
-
-
 (deftemplate agente
 	(slot combustivel)
 	(slot id)
@@ -47,12 +41,7 @@
 	(bind ?cb.combustivel ?ag.combustivel)
 	(retract ?ag)
 )
-;(assert (combate (x 99)(y 100)(id 1)(agua 2)(combustivel 1)(disponivel 1)))
-;(assert (agente (x 55)(y 2)(id 1)(agua 8)(combustivel 1)))
-;(assert (disponivel(valor 0)(id 1)));
-(defquery procuraIncendios
-	(incendio (x ?x)(y ?y)(gravidade ?g))
-)
+
 
 (defquery procuraAgenteCombate
 	(combate (x ?x)(y ?y)(id ?id)(agua ?a)(combustivel ?c)(disponivel ?d)(tipo ?t)(velocidade ?v)(consumo ?co))

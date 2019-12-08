@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.HashMap;
+import Apoio.*;
 
 public class AgenteParticipativo extends Agent implements Serializable{
 	protected double combustivel_atual;

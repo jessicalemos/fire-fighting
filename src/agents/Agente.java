@@ -2,6 +2,7 @@ package agents;
 
 import java.io.Serializable;
 
+import Apoio.Posicao;
 import jade.core.AID;
 
 public class Agente implements Serializable {

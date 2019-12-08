@@ -1,5 +1,5 @@
 package agents;
-
+import Apoio.*;
 import java.io.Serializable;
 
 public class Camiao extends AgenteParticipativo implements Serializable{

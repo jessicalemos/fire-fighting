@@ -1,10 +1,11 @@
 package agents;
 import jade.core.Agent;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import Apoio.*;
 
 import java.util.ArrayList;
 import jade.content.ContentElement;
@@ -36,7 +37,7 @@ public class AgenteCentral extends Agent {
 		this.addBehaviour(new RecebePosicao());
 		this.engine= new Rete();
 		try {
-			engine.batch("agents/ex2.clp");
+			engine.batch("Apoio/ex2.clp");
 			engine.reset();
 		} catch (JessException e) {
 			e.printStackTrace();
@@ -143,8 +144,8 @@ public class AgenteCentral extends Agent {
 							String numero[]=m.getAgente().getLocalName().split(" ");
 							try {
 								engine.executeCommand("(assert (disponivel (valor "+m.isDisponibilidade()+")(id "+numero[1]+")))");
-								engine.executeCommand("(facts)");
 								engine.run();			
+								engine.executeCommand("(facts)");
 							} catch (JessException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

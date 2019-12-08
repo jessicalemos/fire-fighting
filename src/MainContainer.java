@@ -1,9 +1,9 @@
 import jade.core.Runtime;
+import Apoio.Mapa;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
-import agents.Mapa;
 
 public class MainContainer {
 	Runtime rt;
