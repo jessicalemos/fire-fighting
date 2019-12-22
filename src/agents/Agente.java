@@ -2,6 +2,7 @@ package agents;
 
 import java.io.Serializable;
 
+import Apoio.Posicao;
 import jade.core.AID;
 
 public class Agente implements Serializable {
@@ -9,7 +10,7 @@ public class Agente implements Serializable {
 	private double combustivel;
 	private int agua;
 	private Posicao pos;
-	private boolean disponibilidade;
+	private Boolean disponibilidade;
 	private int velocidade;
 	private double consumo;
 	private int tipo; //1-drone, 2-aeronave, 3-camiao
@@ -25,7 +26,7 @@ public class Agente implements Serializable {
 		this.tipo = 0;		
 	}
 	
-	public Agente(AID agente, double combustivel, int agua, int pos_x, int pos_y, boolean disp, int vel, double consumo, int tipo) {
+	public Agente(AID agente, double combustivel, int agua, int pos_x, int pos_y, Boolean disp, int vel, double consumo, int tipo) {
 		super();
 		this.agente = agente;
 		this.combustivel=combustivel;
@@ -42,6 +43,7 @@ public class Agente implements Serializable {
 		this.combustivel=combustivel;
 		this.agua=agua;
 		this.pos = new Posicao(pos_x,pos_y);
+		this.disponibilidade=null;
 	}
 	
 	public Agente(AID agente, int pos_x, int pos_y, int tipo) {
@@ -49,6 +51,7 @@ public class Agente implements Serializable {
 		this.agente = agente;
 		this.pos = new Posicao(pos_x,pos_y);
 		this.tipo = tipo;
+		this.disponibilidade=null;
 	}
 	
 	public AID getAgente() {
@@ -79,11 +82,11 @@ public class Agente implements Serializable {
 		return agua;
 	}
 
-	public boolean isDisponibilidade() {
+	public Boolean isDisponibilidade() {
 		return disponibilidade;
 	}
 
-	public void setDisponibilidade(boolean disponibilidade) {
+	public void setDisponibilidade(Boolean disponibilidade) {
 		this.disponibilidade = disponibilidade;
 	}
 

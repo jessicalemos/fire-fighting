@@ -1,5 +1,4 @@
 package agents;
-
 import java.io.Serializable;
 
 public class Aeronave extends AgenteParticipativo implements Serializable{

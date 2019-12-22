@@ -1,6 +1,7 @@
 package agents;
 import java.io.IOException;
 import java.util.Random;
+
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.core.AID;
@@ -10,7 +11,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-
+import Apoio.*;
 public class AgenteSecundario extends Agent {
 	private int gravidade;
 	private int pos_x;

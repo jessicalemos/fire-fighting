@@ -1,4 +1,4 @@
-package agents;
+package Apoio;
 import java.io.Serializable;
 
 public class Posicao implements Serializable {
